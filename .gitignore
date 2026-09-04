@@ -1,0 +1,21 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Cached API responses and downloaded data (regenerate by running the scripts)
+data/cache/
+data/raw/
+data/parquet/
+*.parquet
+*.csv.gz
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
