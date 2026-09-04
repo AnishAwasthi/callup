@@ -104,17 +104,32 @@ Two traps found while probing these, both of which silently corrupt results:
 
 ```
 callup/
-  statsapi.py     Cached, polite Stats API client; level codes; innings parsing
-  cohort.py       AAA player-seasons partitioned into labeled / thin / censored
+  statsapi.py       Cached, polite Stats API client; level codes; innings parsing
+  cohort.py         AAA player-seasons partitioned into labeled / thin / censored
+  ingest.py         Pitch-level archiving: cap-aware, resumable, raw-preserving
 scripts/
-  cohort_report.py  Viability check — run this first
-tests/            No network; the API is faked
+  cohort_report.py    Viability check — run this first
+  ingest_statcast.py  Archive pitch data (--estimate to plan, resumable)
+tests/              No network; fetching is faked
 ```
+
+## Ingesting pitch data
+
+```bash
+python scripts/ingest_statcast.py --estimate                            # plan
+python scripts/ingest_statcast.py --seasons 2024 --levels MLB --limit 5 # smoke test
+python scripts/ingest_statcast.py                                       # full pull
+```
+
+About 1,000 game-dates across three seasons and two levels, roughly 1.7 hours with the
+built-in politeness delay. Each date is archived separately, so the job is resumable:
+interrupt it whenever, re-run, and it continues from where it stopped. Raw responses are
+kept exactly as served, so re-parsing never means re-downloading.
 
 ## Status
 
 - [x] Viability confirmed — 638 labeled rows across three seasons
-- [ ] Pitch-level ingestion (chunked, resumable, cap-aware)
+- [x] Pitch-level ingestion (per-date, resumable, cap-aware)
 - [ ] Park factors across AAA venues (several at real altitude — Albuquerque 5,100 ft,
       Reno 4,500 ft, Salt Lake 4,200 ft)
 - [ ] Baseline translation model on labeled rows only, with its bias measured
