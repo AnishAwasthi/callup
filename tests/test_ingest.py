@@ -11,9 +11,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from callup import ingest  # noqa: E402
 from callup.ingest import ROW_CAP, TruncatedResponse, count_data_rows, fetch_day  # noqa: E402
 
+# Savant prefixes its CSV with a byte-order mark and leads with pitch_type. The fixture
+# mirrors that because the ingester validates the header before archiving a response.
+CSV_HEADER = '\ufeff"pitch_type","game_date","release_speed"'
+
 
 def csv_bytes(n_rows: int, trailing_newline: bool = False) -> bytes:
-    body = "header_a,header_b\n" + "".join(f"{i},x\n" for i in range(n_rows))
+    body = CSV_HEADER + "\n" + "".join(f'"FF","2024-06-14",{90 + i % 10}\n' for i in range(n_rows))
     if not trailing_newline and body.endswith("\n"):
         body = body[:-1]
     return body.encode()
@@ -142,3 +146,106 @@ def test_urls_are_pinned_to_a_single_date():
     url = ingest._csv_url("MLB", "2024-06-14")
     assert "game_date_gt=2024-06-14" in url
     assert "game_date_lt=2024-06-14" in url
+
+
+# --- transient transport failures ------------------------------------------------
+
+def test_incomplete_read_is_retried_not_fatal(tmp_path, monkeypatch):
+    """
+    A real 1,000-request run died on http.client.IncompleteRead after 849 successes.
+    IncompleteRead is an HTTPException, not an OSError, so the original retry clause
+    missed it entirely and the whole job aborted.
+    """
+    import http.client
+
+    attempts = []
+
+    def flaky(request, timeout=None):
+        attempts.append(1)
+        if len(attempts) < 3:
+            raise http.client.IncompleteRead(b"partial", 500)
+        return _FakeResponse(csv_bytes(10))
+
+    monkeypatch.setattr(ingest.urllib.request, "urlopen", flaky)
+    monkeypatch.setattr(ingest.time, "sleep", lambda s: None)
+    monkeypatch.setattr(ingest, "REQUEST_DELAY_S", 0)
+
+    result = fetch_day("AAA", "2025-06-01", tmp_path)
+    assert result.rows == 10
+    assert len(attempts) == 3
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        ConnectionResetError("reset by peer"),
+        TimeoutError("timed out"),
+        __import__("urllib.error", fromlist=["URLError"]).URLError("dns"),
+        __import__("http.client", fromlist=["RemoteDisconnected"]).RemoteDisconnected("closed"),
+    ],
+)
+def test_every_transient_transport_error_is_retried(tmp_path, monkeypatch, error):
+    attempts = []
+
+    def flaky(request, timeout=None):
+        attempts.append(1)
+        if len(attempts) < 2:
+            raise error
+        return _FakeResponse(csv_bytes(5))
+
+    monkeypatch.setattr(ingest.urllib.request, "urlopen", flaky)
+    monkeypatch.setattr(ingest.time, "sleep", lambda s: None)
+    monkeypatch.setattr(ingest, "REQUEST_DELAY_S", 0)
+
+    assert fetch_day("MLB", "2024-06-14", tmp_path).rows == 5
+
+
+def test_persistent_failure_still_raises(tmp_path, monkeypatch):
+    """Retrying forever would hide a genuine outage; give up loudly."""
+    monkeypatch.setattr(
+        ingest.urllib.request, "urlopen",
+        lambda request, timeout=None: (_ for _ in ()).throw(ConnectionResetError("down")),
+    )
+    monkeypatch.setattr(ingest.time, "sleep", lambda s: None)
+
+    with pytest.raises(RuntimeError, match="failed after"):
+        fetch_day("MLB", "2024-06-14", tmp_path)
+    assert not (tmp_path / "MLB" / "2024-06-14.csv.gz").exists()
+
+
+# --- payload validation ----------------------------------------------------------
+
+def test_non_csv_response_is_rejected_not_archived(tmp_path, monkeypatch):
+    """
+    An HTML error page arrives intact over HTTP. Archiving it would make a later run
+    treat that date as complete, silently losing it from the dataset.
+    """
+    monkeypatch.setattr(
+        ingest.urllib.request, "urlopen",
+        lambda request, timeout=None: _FakeResponse(b"<html>rate limited</html>"),
+    )
+    monkeypatch.setattr(ingest.time, "sleep", lambda s: None)
+
+    with pytest.raises(RuntimeError, match="did not look like Statcast CSV"):
+        fetch_day("AAA", "2025-06-01", tmp_path)
+    assert not (tmp_path / "AAA" / "2025-06-01.csv.gz").exists()
+
+
+def test_real_statcast_header_is_accepted():
+    # Savant prefixes the header with a byte-order mark.
+    assert ingest._looks_like_statcast_csv('﻿"pitch_type","game_date"'.encode())
+    assert not ingest._looks_like_statcast_csv(b"<html>nope</html>")
+
+
+class _FakeResponse:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def read(self):
+        return self._payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False

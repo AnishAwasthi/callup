@@ -26,6 +26,7 @@ Florida State League. Level is joined on afterwards from the Stats API team map,
 from __future__ import annotations
 
 import gzip
+import http.client
 import io
 import json
 import time
@@ -48,7 +49,21 @@ ROW_CAP = 25_000
 
 # Savant is a free public service; a full ingest is hundreds of requests.
 REQUEST_DELAY_S = 2.0
-MAX_RETRIES = 4
+MAX_RETRIES = 5
+
+# Everything that can go wrong between here and Savant, over a run of ~1,000 requests.
+#
+# The first version of this only caught URLError and TimeoutError, and a real run died
+# after 849 successful requests on an http.client.IncompleteRead -- the connection
+# dropped mid-body. IncompleteRead is an HTTPException, not an OSError, so the retry
+# never fired and the whole job aborted. OSError covers URLError, TimeoutError,
+# ConnectionReset and SSLError; HTTPException covers IncompleteRead and
+# RemoteDisconnected.
+TRANSIENT_ERRORS = (OSError, http.client.HTTPException)
+
+# Savant prefixes its CSV with a byte-order mark. Checking the header guards against
+# archiving an error page or a truncated body as though it were data.
+EXPECTED_HEADER_FIELD = b"pitch_type"
 
 DEFAULT_RAW_DIR = Path(__file__).resolve().parents[1] / "data" / "raw"
 
@@ -103,17 +118,36 @@ def _csv_url(level: str, game_date: str) -> str:
     return MINORS_CSV + "?" + urllib.parse.urlencode(params)
 
 
+def _looks_like_statcast_csv(payload: bytes) -> bool:
+    """Cheap sanity check that a response is the CSV we asked for."""
+    return EXPECTED_HEADER_FIELD in payload[:400]
+
+
 def _fetch_bytes(url: str) -> bytes:
+    """Fetch a URL, retrying every transient transport failure with backoff."""
     last_error: Exception | None = None
     for attempt in range(MAX_RETRIES):
         try:
             request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
             with urllib.request.urlopen(request, timeout=300) as response:
-                return response.read()
-        except (urllib.error.URLError, TimeoutError) as exc:
+                payload = response.read()
+        except TRANSIENT_ERRORS as exc:
             last_error = exc
             time.sleep(2**attempt)
-    raise RuntimeError(f"Savant request failed after {MAX_RETRIES} attempts: {url}") from last_error
+            continue
+
+        # A response that arrived intact but is not the expected CSV (an error page, an
+        # empty body) must not be archived -- a later run would treat it as complete.
+        if not _looks_like_statcast_csv(payload):
+            last_error = ValueError(f"response did not look like Statcast CSV ({len(payload)} bytes)")
+            time.sleep(2**attempt)
+            continue
+
+        return payload
+
+    raise RuntimeError(
+        f"Savant request failed after {MAX_RETRIES} attempts ({last_error}): {url}"
+    ) from last_error
 
 
 def game_dates(api: StatsAPI, season: int, level: str) -> list[str]:
@@ -174,9 +208,16 @@ def ingest_season(
     level: str,
     raw_dir: Path = DEFAULT_RAW_DIR,
     limit: int | None = None,
-    progress=print,
+    progress=None,
 ) -> list[DayResult]:
     """Archive every game-date for one season at one level. Safe to re-run."""
+    # Default to a flushing printer: this job runs for the better part of an hour, and
+    # Python buffers stdout when it is piped, so unflushed progress is invisible exactly
+    # when it is most wanted.
+    if progress is None:
+        def progress(message):
+            print(message, flush=True)
+
     dates = game_dates(api, season, level)
     if limit:
         dates = dates[:limit]
