@@ -278,7 +278,7 @@ def load_days(paths, team_levels: dict[str, str] | None = None) -> pd.DataFrame:
     if not frames:
         return pd.DataFrame()
 
-    combined = pd.concat(frames, ignore_index=True)
+    combined = pd.concat(frames, ignore_index=True).copy()
     if team_levels is not None:
         combined["level"] = combined["home_team"].astype(str).str.upper().map(team_levels)
     return combined

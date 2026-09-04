@@ -110,6 +110,7 @@ callup/
 scripts/
   cohort_report.py    Viability check — run this first
   ingest_statcast.py  Archive pitch data (--estimate to plan, resumable)
+  validate_archive.py Data-quality gate — run after ingest, before features
 tests/              No network; fetching is faked
 ```
 
@@ -121,15 +122,35 @@ python scripts/ingest_statcast.py --seasons 2024 --levels MLB --limit 5 # smoke 
 python scripts/ingest_statcast.py                                       # full pull
 ```
 
-About 1,000 game-dates across three seasons and two levels, roughly 1.7 hours with the
-built-in politeness delay. Each date is archived separately, so the job is resumable:
-interrupt it whenever, re-run, and it continues from where it stopped. Raw responses are
-kept exactly as served, so re-parsing never means re-downloading.
+About 1,000 game-dates across three seasons and two levels. Each date is archived
+separately, so the job is resumable: interrupt it whenever, re-run, and it continues from
+where it stopped. Raw responses are kept exactly as served, so re-parsing never means
+re-downloading.
+
+Budget a long window. The first ~850 requests averaged about 3 seconds each, then Savant
+appears to throttle sustained traffic — the remaining 134 dates averaged closer to 3.5
+minutes each. The full pull took roughly eight hours end to end. It is polite by design
+and resumable, so leave it running rather than trying to speed it up.
+
+Then check what landed:
+
+```bash
+python scripts/validate_archive.py
+```
+
+This is a gate, not a formality. It verifies every scheduled date is present, that
+Statcast's player ids actually join to the Stats API ids the cohort is keyed on, that the
+Triple-A / Florida State League separation worked, and that tracking coverage is where it
+should be. A broken id join would not raise anywhere — it would just silently attach
+labels to the wrong players.
+
+Current archive: **4,754,688 pitches** (MLB 2,145,111 · AAA 2,609,577), ~975 MB.
 
 ## Status
 
 - [x] Viability confirmed — 638 labeled rows across three seasons
 - [x] Pitch-level ingestion (per-date, resumable, cap-aware)
+- [x] Archive validated — 4.75M pitches, complete, ids join cleanly
 - [ ] Park factors across AAA venues (several at real altitude — Albuquerque 5,100 ft,
       Reno 4,500 ft, Salt Lake 4,200 ft)
 - [ ] Baseline translation model on labeled rows only, with its bias measured
