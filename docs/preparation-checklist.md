@@ -7,7 +7,7 @@
 - [x] Provide shared contract, dictionary, local genuine starter data and synthetic public offline example.
 - [x] Prepare source trace, format comparison, dataset card, local distribution package, checksums and pinned downloader.
 - [x] Prepare five Week 1 issue bodies, Git guide, PR template, automated offline checks and meeting reference.
-- [ ] Publish prepared code/issues and verify a clean checkout (see reports/final-verification.md for final status).
+- [x] Publish prepared code/issues and verify a clean checkout (see reports/final-verification.md for evidence and access limitations).
 - [ ] Full data sharing: source permission and Hugging Face account/repo/visibility must be resolved. No paid service enabled.
 
 The teammates own features, park research, models and promotion analysis. These are not implemented by preparation.

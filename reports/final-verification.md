@@ -16,7 +16,7 @@ Checked October 6, 2026 (America/Los_Angeles). Repository: https://github.com/An
 
 ## External publication status
 
-Public GitHub repository and Issues created; code publication and hosted CI status are recorded in the repository's commit history/Actions. Genuine data have not been uploaded to any external service. Source checksum metadata and synthetic fixtures are the only data-related material published in code Git. No paid compute, storage add-on or subscription was enabled.
+Public GitHub repository and five Issues created; prepared code and checksum metadata were pushed to main at eefc9bd. [Hosted Actions run](https://github.com/AnishAwasthi/callup/actions/runs/37583464075) records Linux checks for that commit; subsequent handoff-status edits are documentation only. Genuine datasets have not been uploaded to any external service. Source checksum metadata and synthetic fixtures are the only tabular data-related material published in code Git. No paid compute, storage add-on or subscription was enabled.
 
 ## Open decisions/access requirements
 
