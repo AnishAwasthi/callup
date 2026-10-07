@@ -93,7 +93,7 @@ data/sample/  Small synthetic fixture committed to code Git
 data/raw/, cache/, parquet/, processed/, local_sample/, release/  Ignored genuine data
 ```
 
-Person 1: basic hitting features; Person 2: batted-ball features; Person 3: park research/one prototype; Person 4: mean baseline/Ridge infrastructure; Person 5: promotion descriptions/2–4 plots. [Issue briefs](docs/issues/) specify inputs, schemas, dependencies and validation. Final models/features/selection correction/park system/Streamlit remain future work. Follow the [Git guide](docs/git-workflow.md): task branch, focused commits, PR linked to Issue, Anish review. CI runs lint, tests, the synthetic demo and tracked-data guard.
+Person 1: basic hitting features; Person 2: batted-ball features; Person 3: park research/one prototype; Person 4: mean baseline/Ridge infrastructure; Person 5: promotion descriptions/2–4 plots. [Published assignments](docs/assignments.md) and [issue briefs](docs/issues/) specify inputs, schemas, dependencies and validation. Final models/features/selection correction/park system/Streamlit remain future work. Follow the [Git guide](docs/git-workflow.md): fork if you lack push access, task branch, focused commits, PR linked to Issue, Anish review. CI runs lint, tests, the synthetic demo and tracked-data guard.
 
 ## Existing ingestion tools
 

@@ -23,7 +23,7 @@ PA (plate appearance) is a completed batting turn; AB (at-bat) excludes walks an
 | Person 5 | Promotion descriptions | Class balance, missingness, summaries, 2–4 plots; distinguish participation vs eligibility; optional simple logistic regression |
 | Anish | Methodology, review, integration, blockers | Resolve provisional outcomes, source permissions and team data access; review PRs |
 
-Issue bodies in `docs/issues/` specify inputs, outputs, dependencies and acceptance criteria. Handles can be attached later. No one needs to wait for another person's full feature suite to create scaffolding: Persons 1/2 have raw-defined pitch inputs, Person 3 can begin cited research, and Persons 4/5 have the preliminary player-season contract.
+Published Issue links are in `docs/assignments.md`; local bodies in `docs/issues/` specify inputs, outputs, dependencies and acceptance criteria. Handles can be attached later; use the Git guide's fork workflow until collaborator access is configured. No one needs to wait for another person's full feature suite to create scaffolding: Persons 1/2 have raw-defined pitch inputs, Person 3 can begin cited research, and Persons 4/5 have the preliminary player-season contract.
 
 ## Setup exercise (10–15 minutes)
 
