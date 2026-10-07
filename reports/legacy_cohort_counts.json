@@ -1,0 +1,98 @@
+[
+  {
+    "threshold": "loose",
+    "seasons": [
+      2023,
+      2024,
+      2025
+    ],
+    "groups": {
+      "hitting": {
+        "aaa_min": 100,
+        "mlb_min": 50,
+        "labeled": 504,
+        "promoted_thin": 269,
+        "never_promoted": 866,
+        "pool": 1639,
+        "promotion_rate": 0.4716,
+        "censoring_rate": 0.6925
+      },
+      "pitching": {
+        "aaa_min": 30,
+        "mlb_min": 15,
+        "labeled": 423,
+        "promoted_thin": 278,
+        "never_promoted": 852,
+        "pool": 1553,
+        "promotion_rate": 0.4514,
+        "censoring_rate": 0.7276
+      }
+    },
+    "total_labeled": 927,
+    "total_pool": 3192
+  },
+  {
+    "threshold": "moderate",
+    "seasons": [
+      2023,
+      2024,
+      2025
+    ],
+    "groups": {
+      "hitting": {
+        "aaa_min": 150,
+        "mlb_min": 75,
+        "labeled": 353,
+        "promoted_thin": 308,
+        "never_promoted": 724,
+        "pool": 1385,
+        "promotion_rate": 0.4773,
+        "censoring_rate": 0.7451
+      },
+      "pitching": {
+        "aaa_min": 40,
+        "mlb_min": 20,
+        "labeled": 285,
+        "promoted_thin": 242,
+        "never_promoted": 617,
+        "pool": 1144,
+        "promotion_rate": 0.4607,
+        "censoring_rate": 0.7509
+      }
+    },
+    "total_labeled": 638,
+    "total_pool": 2529
+  },
+  {
+    "threshold": "strict",
+    "seasons": [
+      2023,
+      2024,
+      2025
+    ],
+    "groups": {
+      "hitting": {
+        "aaa_min": 200,
+        "mlb_min": 100,
+        "labeled": 246,
+        "promoted_thin": 304,
+        "never_promoted": 588,
+        "pool": 1138,
+        "promotion_rate": 0.4833,
+        "censoring_rate": 0.7838
+      },
+      "pitching": {
+        "aaa_min": 50,
+        "mlb_min": 30,
+        "labeled": 169,
+        "promoted_thin": 214,
+        "never_promoted": 431,
+        "pool": 814,
+        "promotion_rate": 0.4705,
+        "censoring_rate": 0.7924
+      }
+    },
+    "total_labeled": 415,
+    "total_pool": 1952
+  }
+]

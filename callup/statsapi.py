@@ -37,12 +37,13 @@ DEFAULT_CACHE = Path(__file__).resolve().parents[1] / "data" / "cache"
 
 
 class StatsAPI:
-    def __init__(self, cache_dir: Path | None = None, delay_s: float = REQUEST_DELAY_S):
+    def __init__(self, cache_dir: Path | None = None, delay_s: float = REQUEST_DELAY_S, offline: bool = False):
         self.cache_dir = Path(cache_dir) if cache_dir else DEFAULT_CACHE
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.delay_s = delay_s
         self.live_calls = 0
         self.cache_hits = 0
+        self.offline = offline
 
     def _cache_path(self, url: str) -> Path:
         digest = hashlib.sha256(url.encode()).hexdigest()[:20]
@@ -55,6 +56,9 @@ class StatsAPI:
         if cached.exists():
             self.cache_hits += 1
             return json.loads(cached.read_text())
+
+        if self.offline:
+            raise FileNotFoundError(f"Offline cache miss: {cached.name} for {url}")
 
         payload = self._fetch(url)
         cached.write_text(json.dumps(payload))
@@ -110,21 +114,35 @@ class StatsAPI:
     def teams(self, season: int, level: str) -> list[dict]:
         return self.get("teams", sportId=SPORT_IDS[level], season=season).get("teams", [])
 
-    def team_level_map(self, season: int) -> dict[str, str]:
+    def team_level_candidates(self, season: int, levels: tuple[str, ...] = ("AAA", "AA", "A+", "A")) -> dict[str, frozenset[str]]:
         """
-        Map every team abbreviation to its level.
+        Map minor-league team abbreviations to levels in a selected feed scope.
 
         Needed because the Baseball Savant minors CSV export carries ``home_team`` and
         ``away_team`` but **no level column** -- the feed mixes Triple-A and the Florida
         State League together, so team abbreviation is the only way to tell them apart.
         """
-        mapping: dict[str, str] = {}
-        for level in ("MLB", "AAA", "AA", "A+", "A"):
-            for team in self.teams(season, level):
-                for key in (team.get("abbreviation"), team.get("teamCode"), team.get("fileCode")):
-                    if key:
-                        mapping[str(key).upper()] = level
-        return mapping
+        # MLB COL (Colorado) and AAA COL (Columbus) cannot share one unscoped map.
+        # Secondary aliases must never overwrite canonical abbreviations: Single-A
+        # Columbia's teamCode=col previously overwrote Columbus abbreviation=COL.
+        teams = [(level, team) for level in levels for team in self.teams(season, level)]
+        mapping: dict[str, set[str]] = {}
+        for level, team in teams:
+            for key in (team.get("teamCode"), team.get("fileCode")):
+                if key:
+                    mapping.setdefault(str(key).upper(), set()).add(level)
+        abbreviations: dict[str, set[str]] = {}
+        for level, team in teams:
+            key = team.get("abbreviation")
+            if key:
+                code = str(key).upper()
+                abbreviations.setdefault(code, set()).add(level)
+        mapping.update(abbreviations)
+        return {code: frozenset(candidates) for code, candidates in mapping.items()}
+
+    def team_level_map(self, season: int, levels: tuple[str, ...] = ("AAA", "AA", "A+", "A")) -> dict[str, str]:
+        """Only unambiguous codes. Use candidates plus both opponents for mixed feeds."""
+        return {code: next(iter(candidates)) for code, candidates in self.team_level_candidates(season, levels).items() if len(candidates) == 1}
 
 
 def innings_to_float(value) -> float:

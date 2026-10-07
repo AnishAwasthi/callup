@@ -10,6 +10,10 @@ __pycache__/
 data/cache/
 data/raw/
 data/parquet/
+data/processed/
+data/release/
+data/local_sample/
+data/incoming/
 *.parquet
 *.csv.gz
 

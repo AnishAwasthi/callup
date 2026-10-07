@@ -1,0 +1,9 @@
+player_id,name,season,outcome_year,prediction_date,aaa_pa,aaa_hits,aaa_ab,aaa_bb,aaa_k,aaa_hr,aaa_observed_pitches,aaa_observed_pa,aaa_first_date,aaa_last_date,mlb_pa,reached_mlb,outcome_eligible,label_available,mlb_woba,mlb_woba_numerator,mlb_woba_denom,mlb_observed_pa,mlb_first_date,mlb_last_date,outcome_status,split,label_provisional,data_kind
+9000001,Synthetic Hitter 9000001,2023,2024,2024-01-01,180,40,160,15,30,4,12,3,2023-04-01,2023-04-01,100,True,True,True,0.31,31.0,100.0,100,2024-04-01,2024-09-01,eligible,train,True,synthetic
+9000002,Synthetic Hitter 9000002,2023,2024,2024-01-01,200,41,175,16,33,5,12,3,2023-04-01,2023-04-01,100,True,True,True,0.335,33.5,100.0,100,2024-04-01,2024-09-01,eligible,train,True,synthetic
+9000003,Synthetic Hitter 9000003,2023,2024,2024-01-01,220,42,190,17,36,6,12,3,2023-04-01,2023-04-01,20,True,False,False,,0.0,0.0,20,2024-04-01,2024-09-01,thin,train,True,synthetic
+9000004,Synthetic Hitter 9000004,2023,2024,2024-01-01,240,43,205,18,39,7,12,3,2023-04-01,2023-04-01,0,False,False,False,,0.0,0.0,0,,,not_observed,train,True,synthetic
+9000011,Synthetic Hitter 9000011,2024,2025,2025-01-01,180,40,160,15,30,4,12,3,2024-04-01,2024-04-01,100,True,True,True,0.31,31.0,100.0,100,2025-04-01,2025-09-01,eligible,test,True,synthetic
+9000012,Synthetic Hitter 9000012,2024,2025,2025-01-01,200,41,175,16,33,5,12,3,2024-04-01,2024-04-01,100,True,True,True,0.335,33.5,100.0,100,2025-04-01,2025-09-01,eligible,test,True,synthetic
+9000013,Synthetic Hitter 9000013,2024,2025,2025-01-01,220,42,190,17,36,6,12,3,2024-04-01,2024-04-01,20,True,False,False,,0.0,0.0,20,2025-04-01,2025-09-01,thin,test,True,synthetic
+9000014,Synthetic Hitter 9000014,2024,2025,2025-01-01,240,43,205,18,39,7,12,3,2024-04-01,2024-04-01,0,False,False,False,,0.0,0.0,0,,,not_observed,test,True,synthetic

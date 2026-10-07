@@ -6,21 +6,22 @@ same player's major-league line the following season. Three groups come out of t
 and keeping them distinct is the whole point:
 
 ``labeled``
-    Played enough at AAA in year Y *and* enough in MLB in year Y+1. These are the only
-    rows a supervised model can train on.
+    Played enough at AAA in year Y *and* enough in MLB in year Y+1. This is workload
+    eligibility only; the actual outcome must still be constructed and verified.
 
 ``promoted_thin``
     Reached MLB but below the sample threshold. Promoted, but the outcome is too noisy
     to use as a label.
 
 ``never_promoted``
-    Never reached MLB at all. **These rows have no outcome and never will.**
+    No MLB stats row in the following-season snapshot. The legacy name is window-specific,
+    not evidence that a player never reaches MLB in their career. A stats row can also
+    have zero batting PA; the hitter preparation defines participation as positive PA.
 
-That last group is roughly three quarters of the pool, and it is the reason this project
-needs a selection correction rather than a plain regression. A model fit only on
-``labeled`` players is fit on a population that a front office already decided was good
-enough to call up. Scoring it on everyone else assumes the call-up decision carried no
-information, which is precisely backwards -- it carried a great deal.
+The combined unavailable/thin-outcome groups are roughly three quarters of the legacy
+pool. Models fit on eligible participants may not generalize to the full AAA pool.
+Selection correction requires additional assumptions and does not guarantee unbiased
+predictions. See docs/methodology.md for the approved provisional hitter contract.
 
 Same structural problem as estimating the wage return to a degree using only people who
 are employed.

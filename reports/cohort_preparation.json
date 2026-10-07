@@ -1,0 +1,35 @@
+{
+  "seasons": [
+    2023,
+    2024
+  ],
+  "pool": 926,
+  "eligible": 239,
+  "labels_available_provisional": 239,
+  "reached": 443,
+  "thin": 204,
+  "not_observed": 483,
+  "splits": {
+    "excluded_overlap": {
+      "rows": 262,
+      "labels": 52
+    },
+    "test": {
+      "rows": 456,
+      "labels": 125
+    },
+    "train": {
+      "rows": 208,
+      "labels": 62
+    }
+  },
+  "aaa_pa_mismatches": 464,
+  "mlb_pa_mismatches_among_reached": 104,
+  "sample_rows": 13,
+  "sample_pitches": 14067,
+  "limitations": [
+    "wOBA is a provisional reconstruction from served Savant values, not an independently reconciled official season wOBA.",
+    "Observed terminal events need not equal official PA; automatic/no-pitch events and source discrepancies require investigation.",
+    "No 2026 pitch archive; September 3 cached 2026 API snapshot excluded."
+  ]
+}

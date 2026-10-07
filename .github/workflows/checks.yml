@@ -1,0 +1,26 @@
+name: checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: python -m pip install -r requirements-lock.txt
+      - run: ruff check .
+      - run: pytest
+      - run: python scripts/offline_example.py
+      - name: Ensure source records and large data stay out of Git
+        run: |
+          python - <<'PY'
+          import pathlib, subprocess
+          files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+          forbidden = ('data/raw/', 'data/cache/', 'data/parquet/', 'data/processed/', 'data/release/', 'data/local_sample/', 'data/incoming/')
+          assert not any(p.startswith(forbidden) or p.endswith(('.parquet', '.csv.gz')) for p in files)
+          assert not any(pathlib.Path(p).is_file() and pathlib.Path(p).stat().st_size > 5_000_000 for p in files)
+          PY

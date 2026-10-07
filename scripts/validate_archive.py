@@ -62,7 +62,7 @@ def check_season(api: StatsAPI, raw_dir: Path, season: int, sample_every: int) -
         print(f"\nNo archived AAA dates for {season}; run the ingest first.")
         return False
 
-    frame = load_days(paths, team_levels=api.team_level_map(season))
+    frame = load_days(paths, team_levels=api.team_level_candidates(season))
     aaa = frame[frame["level"] == "AAA"]
 
     print(f"\nSample: {len(paths)} AAA dates from {season} -> {len(frame):,} rows")

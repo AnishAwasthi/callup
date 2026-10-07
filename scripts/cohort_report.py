@@ -79,9 +79,10 @@ def main() -> None:
     parser.add_argument("--seasons", type=int, nargs="+", default=DEFAULT_SEASONS)
     parser.add_argument("--json", action="store_true", help="emit JSON instead of a table")
     parser.add_argument("--all-thresholds", action="store_true", help="sweep every threshold")
+    parser.add_argument("--offline", action="store_true", help="fail on cache misses; never fetch")
     args = parser.parse_args()
 
-    api = StatsAPI()
+    api = StatsAPI(offline=args.offline)
     thresholds = sorted(THRESHOLDS["hitting"]) if args.all_thresholds else [args.threshold]
     summaries = [summarize(api, args.seasons, t) for t in thresholds]
 

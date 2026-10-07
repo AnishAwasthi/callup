@@ -1,167 +1,107 @@
-# callup
+# Callup
 
-> Translating Triple-A performance into major-league expectations — using real linked
-> data, and taking the selection problem seriously.
+Callup studies how Triple-A hitter performance translates into **next-season MLB wOBA**, including selection into MLB participation and sufficient playing time. Week 1 covers features, park research, modeling infrastructure and promotion descriptions. Anish owns methodology, review and integration. Selection correction is later research and does not guarantee unbiased predictions.
 
-A **call-up** is the moment a player is promoted from Triple-A to the majors. This
-project asks the question that precedes it: *given what a player did at AAA, what should
-we expect in MLB?*
+Start with the [meeting reference](docs/first-meeting.md), [shared contract](docs/data-contract.md), [methodology](docs/methodology.md), [data dictionary](docs/data-dictionary.md), [Git guide](docs/git-workflow.md) and [five assignment briefs](docs/issues/).
 
----
+## Clone, install and run offline
 
-## Why this is a real problem and not a toy
-
-Everyone who has looked at minor-league translation hits the same wall, and most projects
-walk straight past it.
-
-**You only observe major-league outcomes for players who got promoted.** Teams promote
-players they already believe will succeed — using scouting information, medicals, and
-organizational context that never appears in a box score. So the labeled sample is not a
-random draw from Triple-A. It is the part of the distribution a front office already
-selected.
-
-Fit a plain regression on that sample and apply it to everyone, and you have implicitly
-assumed the promotion decision carried no information. It carried a great deal. This is
-the same structural problem as estimating the wage return to a college degree using only
-people who are currently employed.
-
-**In this dataset, roughly 75% of qualifying AAA player-seasons have no usable
-major-league outcome.** That is not a footnote. It is the modeling problem.
-
-## Is there enough data? (yes — this was checked first)
-
-Before writing any model, [`scripts/cohort_report.py`](scripts/cohort_report.py) answers
-the only question that matters at the start: does a real labeled cohort exist?
-
-```
-AAA -> MLB cohort  ·  seasons [2023, 2024, 2025]  ·  moderate thresholds
-
-HITTING   (AAA >= 150 PA, MLB >= 75 PA)
-  labeled  (usable for training)    353
-  promoted but thin sample          308
-  never reached MLB                 724
-  pool                             1385
-  no usable outcome (censored)    74.5%
-
-PITCHING  (AAA >= 40 IP, MLB >= 20 IP)
-  labeled  (usable for training)    285
-  promoted but thin sample          242
-  never reached MLB                 617
-  pool                             1144
-  no usable outcome (censored)    75.1%
-
-TOTAL labeled training rows: 638
-TOTAL AAA player-seasons:    2529
-```
-
-638 real labeled examples, with a censored majority large enough that ignoring it would
-be indefensible. Run it yourself:
+Use **Python 3.13** for the tested pinned environment. Install it from [python.org](https://www.python.org/downloads/) if needed. macOS/Linux Terminal:
 
 ```bash
-pip install -r requirements.txt
-python scripts/cohort_report.py --all-thresholds
+git clone https://github.com/AnishAwasthi/callup.git
+cd callup
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-lock.txt
+python scripts/offline_example.py
+pytest
+ruff check .
 ```
 
-Responses are cached to `data/cache/`, so the first run takes a minute and every run
-after is instant.
+Windows PowerShell: `py -3.13 -m venv .venv` then `.venv\Scripts\Activate.ps1`; remaining commands are the same. If activation is restricted, use `.venv\Scripts\python.exe` directly. Installing needs internet once; demo/tests need no network, source archive or credentials. The original broad requirements target Python ≥3.11, but the frozen set is tested on 3.13, not every older version. Run from the repository root. For missing packages, activate the environment and use `python -m pip` with the same interpreter that runs scripts.
 
-## Why AAA and not college
+Expect **8 synthetic player-seasons and 96 toy pitches**, contract checks and class counts. These invented records verify setup and joins only; do not use them for baseball conclusions.
 
-An earlier version of this idea tried to translate **amateur** (NCAA / Cape Cod)
-performance to MLB. That cannot be validated with public data: amateur tracking data is
-proprietary, and there is no public mapping from an amateur player to their eventual
-major-league career. Any "accuracy" reported against such a dataset is fabricated by
-construction.
+## Genuine starter data and access
 
-Triple-A is different, and that difference is the entire reason this project exists:
-
-- **Statcast tracking has been public for all of Triple-A since 2023**, via Baseball
-  Savant's [minor-league search](https://baseballsavant.mlb.com/statcast-search-minors).
-- Players carry the **same MLBAM player id** across levels, so the AAA season and the
-  MLB season are linked by construction rather than by guesswork.
-- Promotions happen constantly, giving hundreds of genuinely matched pairs per year.
-
-The translation question is the same. The difference is that here it can actually be
-answered.
-
-## Data sources
-
-| Source | What it provides | Notes |
-|---|---|---|
-| [MLB Stats API](https://statsapi.mlb.com/api/v1/) | Season lines, rosters, teams, levels | Public, no key. `sportId` 1=MLB, 11=AAA |
-| [Baseball Savant](https://baseballsavant.mlb.com/statcast-search-minors) | Pitch-level tracking, MLB and AAA | CSV export; **hard 25,000-row cap per query** |
-
-Two traps found while probing these, both of which silently corrupt results:
-
-1. **Savant truncates at exactly 25,000 rows with no error.** A seven-day MLB query
-   returns precisely 25,000 rows and looks fine. Ingestion must chunk by date and detect
-   when a chunk hits the cap.
-2. **The minors CSV has no level column.** The feed mixes Triple-A with the Florida State
-   League, and the only way to tell them apart is the team abbreviation — so the level
-   has to be joined on from the Stats API.
-
-## Layout
-
-```
-callup/
-  statsapi.py       Cached, polite Stats API client; level codes; innings parsing
-  cohort.py         AAA player-seasons partitioned into labeled / thin / censored
-  ingest.py         Pitch-level archiving: cap-aware, resumable, raw-preserving
-scripts/
-  cohort_report.py    Viability check — run this first
-  ingest_statcast.py  Archive pitch data (--estimate to plan, resumable)
-  validate_archive.py Data-quality gate — run after ingest, before features
-tests/              No network; fetching is faked
-```
-
-## Ingesting pitch data
+The preparation machine has a genuine starter table in `data/processed/hitter_seasons.csv`/`.parquet`, plus a small real sample and full selected AAA pitch histories in `data/local_sample/`:
 
 ```bash
-python scripts/ingest_statcast.py --estimate                            # plan
-python scripts/ingest_statcast.py --seasons 2024 --levels MLB --limit 5 # smoke test
-python scripts/ingest_statcast.py                                       # full pull
+python scripts/offline_example.py --sample-dir data/local_sample
 ```
 
-About 1,000 game-dates across three seasons and two levels. Each date is archived
-separately, so the job is resumable: interrupt it whenever, re-run, and it continues from
-where it stopped. Raw responses are kept exactly as served, so re-parsing never means
-re-downloading.
+These files stay outside Git. **Teammate access to genuine data is pending source redistribution permission.** No applicable open-data license was established; the public code repository carries a synthetic fixture. [Data-access instructions](docs/data-access.md) document the prepared local release, free Hugging Face limits, required rights/account choices and complete download-to-analysis workflow.
 
-Budget a long window. The first ~850 requests averaged about 3 seconds each, then Savant
-appears to throttle sustained traffic — the remaining 134 dates averaged closer to 3.5
-minutes each. The full pull took roughly eight hours end to end. It is polite by design
-and resumable, so leave it running rather than trying to speed it up.
-
-Then check what landed:
+Hugging Face publication is pending. `dataset-lock.json` explicitly has null fields; the downloader fails helpfully. After an approved release, commit the exact 40-character dataset commit SHA and manifest checksum, then teammates run:
 
 ```bash
+python scripts/download_dataset.py --install
+python scripts/offline_example.py --sample-dir data/local_sample
+```
+
+No paid services or subscriptions are used. Review the [dataset card](docs/dataset-card.md) and [storage comparison](docs/storage-comparison.md). Public endpoint access does not establish bulk-download/redistribution permission.
+
+## Agreed provisional cohort
+
+AAA hitters with **≥150 PA in 2023–2024**, prediction **January 1 of Y+1**, next regular-season MLB wOBA with **≥75 MLB PA**. Pool: **926 player-seasons; 239 workload-eligible outcomes**. Reconstruction from served Savant values is provisional and needs independent official reconciliation. Full 2024 pool is test; all 2023 players also in that pool are excluded from training. This gives 208 training pool rows (62 workload-eligible), 262 excluded overlap rows, and 456 test rows (125 eligible). Available provisional labels, coverage and PA discrepancies appear in the [generated report](reports/cohort_preparation.json).
+
+The existing cohort already pairs Y with Y+1. Reproduced cached moderate counts for AAA 2023–2025:
+
+| Group | Pool | MLB workload eligible | Thin MLB sample | No next-year row |
+|---|---:|---:|---:|---:|
+| Hitting (AAA ≥150 PA; MLB ≥75 PA) | 1,385 | 353 | 308 | 724 |
+| Pitching (AAA ≥40 IP; MLB ≥20 IP) | 1,144 | 285 | 242 | 617 |
+| Combined player-season-group rows | 2,529 | 638 | 550 | 1,341 |
+
+Combined rows are not hitter counts or unique people. Legacy `labeled` means workload eligibility, not a verified wOBA value. The 2025→2026 outcomes were cached September 3, 2026 and are incomplete; exclude them initially. Legacy `never_promoted` means no next-year row, not never in a career. Our `reached_mlb` means next-season batting PA>0, including returning MLB players; it differs from outcome eligibility and label availability.
+
+```bash
+python scripts/cohort_report.py --offline --all-thresholds
+python scripts/cohort_report.py --offline --seasons 2023 2024 --json
+```
+
+These commands need the frozen cache from a permitted release. Offline mode refuses cache misses. Do not force counts to match old results after changing the snapshot or definitions.
+
+## Preserved archive and reproducibility
+
+457 requested AAA/mixed-minors plus 552 MLB gzip CSV shards, six manifests, **4,754,688 rows**: MLB 2,145,111; requested minors 2,609,577. True AAA is 2,038,255 rows, with 571,322 Single-A rows in the minors feed. Derive true levels using both opponents' season-specific candidates. `COL` identifies AAA Columbus and Single-A Columbia; preparation fixes the old single-code mapping bug. All cohort IDs join after correction.
+
+The full audit reads every gzip through its CRC, checks cap/keys/date/game type/schedules/manifests/true levels/ID coverage, and verifies every parsed cell/null survives conversion. Source hashes remain unchanged; global pitch keys are unique. One 2023 MLB empty resume-date export is explained by its game under the official earlier date. Date/ID coverage does not prove every upstream PA exists; PA/measurement discrepancies remain explicit. See [storage report](reports/storage.json).
+
+**Use Parquet for repeated analysis; retain gzip CSV as the source archive.** Verified staging Parquet is 18.9% smaller: 827.5 MB versus 1,019.8 MB. Six-shard warm-cache reads were about 9× faster for all columns and 16× for seven selected columns. ID/key columns are nullable int64; other source tokens remain text to preserve decimal spelling exactly. Parse analytical numerics explicitly. Prepared player-season Parquet has typed counts, booleans and numeric outcomes. The [format memo](docs/storage-comparison.md) explains tradeoffs and benchmark limits.
+
+On the preparation machine or after a permitted full-data download:
+
+```bash
+python scripts/prepare_storage.py
+python scripts/prepare_analysis.py
+python scripts/package_dataset.py --output data/release-new
+```
+
+Preparation uses local/cached data and never overwrites raw pitch files. Commit reviewed preparation code before packaging: the package requires a clean worktree and records its exact code revision. Use a new release path to avoid stale files. Published checksum metadata in `reports/release_checksums.json` describes a local package; no Hub revision is claimed until upload.
+
+## Layout and assignments
+
+```text
+callup/       Existing ingestion/cohort/API code; storage/contract safeguards
+scripts/      Audit/conversion, starter preparation, download, packaging, offline demo
+tests/        Network-free tests
+docs/         Methodology, contract, dictionary, guides, dataset card, issue briefs
+reports/      Aggregate audit/counts/benchmark/checksum metadata; no source records
+data/sample/  Small synthetic fixture committed to code Git
+data/raw/, cache/, parquet/, processed/, local_sample/, release/  Ignored genuine data
+```
+
+Person 1: basic hitting features; Person 2: batted-ball features; Person 3: park research/one prototype; Person 4: mean baseline/Ridge infrastructure; Person 5: promotion descriptions/2–4 plots. [Issue briefs](docs/issues/) specify inputs, schemas, dependencies and validation. Final models/features/selection correction/park system/Streamlit remain future work. Follow the [Git guide](docs/git-workflow.md): task branch, focused commits, PR linked to Issue, Anish review. CI runs lint, tests, the synthetic demo and tracked-data guard.
+
+## Existing ingestion tools
+
+Ingestion uses urllib and daily Savant CSV exports, **not pybaseball**, with resume and 25,000-row cap detection. Avoid repeating the full download. Existing commands remain for authorized use:
+
+```bash
+python scripts/ingest_statcast.py --estimate
 python scripts/validate_archive.py
 ```
 
-This is a gate, not a formality. It verifies every scheduled date is present, that
-Statcast's player ids actually join to the Stats API ids the cohort is keyed on, that the
-Triple-A / Florida State League separation worked, and that tracking coverage is where it
-should be. A broken id join would not raise anywhere — it would just silently attach
-labels to the wrong players.
-
-Current archive: **4,754,688 pitches** (MLB 2,145,111 · AAA 2,609,577), ~975 MB.
-
-## Status
-
-- [x] Viability confirmed — 638 labeled rows across three seasons
-- [x] Pitch-level ingestion (per-date, resumable, cap-aware)
-- [x] Archive validated — 4.75M pitches, complete, ids join cleanly
-- [ ] Park factors across AAA venues (several at real altitude — Albuquerque 5,100 ft,
-      Reno 4,500 ft, Salt Lake 4,200 ft)
-- [ ] Baseline translation model on labeled rows only, with its bias measured
-- [ ] Selection-corrected model, compared against that baseline
-- [ ] Held-out evaluation on the most recent promotion window
-
-The fourth and fifth items are the point of the project. The deliverable is the
-*difference* between them.
-
-## Testing
-
-```bash
-pytest
-```
+The original validator checks schedules plus sampled 2024 AAA rows; `prepare_storage.py` performs full-record checks. Legacy live commands may fetch uncached metadata; do not call them guaranteed offline. Preserve original files; do not force-overwrite them.

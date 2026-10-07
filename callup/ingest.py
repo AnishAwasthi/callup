@@ -262,7 +262,24 @@ def load_day(path: Path) -> pd.DataFrame:
         return pd.read_csv(io.BytesIO(handle.read()), low_memory=False)
 
 
-def load_days(paths, team_levels: dict[str, str] | None = None) -> pd.DataFrame:
+def derive_levels(frame: pd.DataFrame, team_levels: dict) -> pd.Series:
+    """Resolve feed level from the intersection of both opponents' candidates.
+
+    COL is Columbus (AAA) or Columbia (A). Its nonambiguous opponent resolves it.
+    Unknown codes or an unresolved pair remain null, never guessed into AAA.
+    """
+    def candidates(code):
+        value = team_levels.get(str(code).upper(), frozenset())
+        return {value} if isinstance(value, str) else set(value)
+
+    pairs = {}
+    for home, away in frame[["home_team", "away_team"]].drop_duplicates().itertuples(index=False, name=None):
+        common = candidates(home) & candidates(away)
+        pairs[(home, away)] = next(iter(common)) if len(common) == 1 else None
+    return pd.Series([pairs[(h, a)] for h, a in frame[["home_team", "away_team"]].itertuples(index=False, name=None)], index=frame.index, dtype="string")
+
+
+def load_days(paths, team_levels: dict | None = None) -> pd.DataFrame:
     """
     Parse and concatenate archived days, tagging each row's true level.
 
@@ -280,5 +297,5 @@ def load_days(paths, team_levels: dict[str, str] | None = None) -> pd.DataFrame:
 
     combined = pd.concat(frames, ignore_index=True).copy()
     if team_levels is not None:
-        combined["level"] = combined["home_team"].astype(str).str.upper().map(team_levels)
+        combined["level"] = derive_levels(combined, team_levels)
     return combined
