@@ -4,13 +4,17 @@ Calculate useful hitting statistics for every player-season in our Triple-A stud
 
 ## Data
 
-Download the Google Drive package using the [README](https://github.com/AnishAwasthi/callup#readme). Use `data/parquet/AAA/`, the saved team information in `data/cache/`, and `data/processed/hitter_seasons.csv`. Try `data/local_sample/` first. You can start independently of the other tasks.
+Download [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) and unzip it to get `callup-csv/`.
+
+Use the files inside the unzipped `callup-csv` folder: `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv`, and `data/processed/hitter_seasons.csv`. Filter pitches to `in_cohort=True`, calculate PA, strikeout, walk, swing, and contact rates per player-season, and join to all 926 study rows using `batter = player_id` and matching `season`.
+
+The two CSVs in `data/local_sample/` are an optional five-player practice sample; check calculations there, then run on the full files. Keep missing measurements and outcomes blank rather than replacing them with zero. You can start independently of the other tasks.
 
 ## Work
 
 - Calculate plate appearances (completed batting turns), strikeout rate, walk rate, swing rate, and contact rate.
 - Include **all 926 player-seasons**, even when a player has no next-season MLB outcome.
-- Use actual Triple-A games from each player's 2023 or 2024 season. The `AAA` folder also includes Single-A games; follow the data instructions to filter them.
+- The pitch CSVs are already filtered to actual Triple-A games in 2023–2024; select `in_cohort=True` and match each player's season.
 - Count each batting turn once. Explain what counts as a swing or contact, and leave rates blank when there is nothing to divide by.
 
 ## Deliver

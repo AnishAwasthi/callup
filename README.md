@@ -23,17 +23,15 @@ The example uses **invented data** included in GitHub to check that your setup w
 
 ## Get the real data
 
-Download the full dataset from the team's [shared Google Drive folder](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link). The complete package is about **1.9 GB**; it is kept outside GitHub.
+Download the [CSV working-data ZIP](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) (about **14 MB**, or 113 MB unzipped) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1). It contains the files needed for issues #1–#5.
 
-Unzip the package if needed. Copy its `raw`, `cache`, `parquet`, `processed`, and `local_sample` folders into this project's `data/` folder. Then check the real sample:
+Unzip it to get `callup-csv/`. Copy the contents of its `data/` folder into this project's `data/` folder, or work directly inside `callup-csv/`. Keep the package's README, `manifest.json`, and `reports/cohort_preparation.json` for instructions and checking totals.
 
-```bash
-python scripts/offline_example.py --sample-dir data/local_sample
-```
+Start with **`data/processed/hitter_seasons.csv`**: 926 rows, one per player and Triple-A season. You can open it in Excel. For pitch analysis, use `data/pitches/aaa_2023.csv` and `aaa_2024.csv`; these are already filtered to actual Triple-A games. Issues #1–#2 should select `in_cohort=True`; issue #3 uses all pitch rows and `data/teams.csv`. Join hitter features using `batter = player_id` and matching `season`. Keep missing measurements and outcomes blank.
 
-Start with **`data/processed/hitter_seasons.csv`**: 926 rows, one per player and Triple-A season. You can open it in Excel. For pitch-level analysis, use the Parquet files in `data/parquet/`; Parquet is a compact table format read with Python. Keep the original compressed CSV files in `data/raw/`.
+The two CSVs in `data/local_sample/` are an **optional five-player practice sample**. Read these CSVs directly; the older `offline_example.py --sample-dir` loader expects the original archive's schema. Run final analyses on the full files.
 
-The `AAA` pitch folder includes other minor-league levels, so filter to actual Triple-A games before calculating features. [Data instructions](docs/data-access.md) explain the files and filtering. You do not need to download the data again from MLB or use Hugging Face.
+[Data instructions](docs/data-access.md) cover loading and verification. The original **1.9 GB** archive remains in the [shared Google Drive folder](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link) for source audits and additional research.
 
 ## Team work
 

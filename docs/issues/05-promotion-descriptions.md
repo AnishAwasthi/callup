@@ -4,7 +4,9 @@ Describe which Triple-A hitters play in MLB next season, and how much usable inf
 
 ## Data
 
-Download the Google Drive package using the [README](https://github.com/AnishAwasthi/callup#readme). Use **all 926 rows** in `data/processed/hitter_seasons.csv`. You can start independently of the other four tasks.
+Download [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) and unzip it to get `callup-csv/`.
+
+Use **all 926 rows** in `data/processed/hitter_seasons.csv` inside the unzipped `callup-csv` folder, plus `reports/cohort_preparation.json` to check totals. Summarize participation, eligibility, and available labels; compare groups and create 2–4 plots. Keep missing measurements and outcomes blank rather than replacing them with zero. You can start independently of the other four tasks.
 
 ## Work
 

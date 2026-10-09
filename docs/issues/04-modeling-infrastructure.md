@@ -4,7 +4,9 @@ Build a simple starting point for predicting next-season MLB batting performance
 
 ## Data
 
-Download `data/processed/hitter_seasons.csv` from the Google Drive package using the [README](https://github.com/AnishAwasthi/callup#readme). Start with its Triple-A counts: plate appearances, hits, at-bats, walks, strikeouts, and home runs. You can begin before Persons 1 and 2 finish.
+Download [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) and unzip it to get `callup-csv/`.
+
+Use `data/processed/hitter_seasons.csv` inside the unzipped `callup-csv` folder: its existing Triple-A counts, provisional next-season MLB wOBA, and frozen `split` are enough to evaluate the training-average baseline and Ridge model using available labels. Keep missing outcomes blank rather than replacing them with zero. You can begin before Persons 1 and 2 finish.
 
 ## Work
 

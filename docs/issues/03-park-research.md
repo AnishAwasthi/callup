@@ -4,7 +4,9 @@ Recommend a practical way to account for Triple-A ballpark differences, then try
 
 ## Start
 
-Begin with research; you do not need the dataset yet. For the example, download the Google Drive package using the [README](https://github.com/AnishAwasthi/callup#readme) and agree on a statistic with Anish.
+Download [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) and unzip it to get `callup-csv/`.
+
+Begin with research; you do not need the dataset yet. For the small prototype, agree on a statistic with Anish and use `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv`, and `data/teams.csv` inside the unzipped `callup-csv` folder. Use **all pitch rows**, including hitters outside the study cohort; compare park-factor methods and verify historical venue mappings before treating the team metadata as a final venue map. Keep missing measurements and outcomes blank rather than replacing them with zero.
 
 ## Work
 

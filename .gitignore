@@ -10,6 +10,8 @@ __pycache__/
 data/cache/
 data/raw/
 data/parquet/
+data/pitches/
+data/teams.csv
 data/processed/
 data/release/
 data/local_sample/

@@ -1,6 +1,36 @@
 # Working with the data
 
-## Download from Google Drive
+## Download the CSV working data
+
+The [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) includes [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip): about **14 MB** compressed and **113 MB** unzipped. It is the working package for issues #1–#5.
+
+Unzip it to get `callup-csv/`. Copy its `data/` contents into the cloned project's `data/` folder, or use the unzipped folder as your working directory. Retain the included README, `manifest.json`, and `reports/cohort_preparation.json`. The manifest records individual table hashes; the release's `.sha256` attachment records the ZIP hash.
+
+| Input | Use |
+|---|---|
+| `data/processed/hitter_seasons.csv` | All 926 study player-seasons; primary input for issues #4–#5 |
+| `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv` | Actual Triple-A pitches; issues #1–#2 select `in_cohort=True`, while issue #3 uses all rows |
+| `data/teams.csv` | Issue #3's starting team/venue lookup; verify historical mappings |
+| `data/local_sample/hitter_seasons.csv`, `data/local_sample/pitches.csv` | Optional five-player practice sample, with 6,617 pitches; do not append it to full data |
+| `reports/cohort_preparation.json` | Issue #5's totals check |
+
+Read the reduced CSVs directly, for example:
+
+```python
+import pandas as pd
+
+hitters = pd.read_csv("data/processed/hitter_seasons.csv", keep_default_na=False, na_values=[""])
+pitches = pd.read_csv("data/pitches/aaa_2023.csv", keep_default_na=False, na_values=[""])
+cohort_pitches = pitches.loc[pitches["in_cohort"].eq(True)]
+```
+
+Aggregate hitter features by `batter, season`, then attach them to all 926 study rows using `batter = player_id` and matching `season`. Empty cells mean missing, not zero. Outcomes and the existing split are unchanged; wOBA and venue mappings remain provisional.
+
+The older `offline_example.py --sample-dir` loader expects the original archive's sample schema and does not load this reduced package. No API/cache download or Parquet conversion is needed for normal CSV analysis. Keep the CSV inputs and generated data out of Git.
+
+## Original archive on Google Drive
+
+The remaining setup, sample-loader, and source-rebuilding instructions on this page apply to the **original larger archive**, retained for audits and additional research. They are not required for the reduced CSV package.
 
 Anish has uploaded the dataset to the [team's shared Google Drive folder](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link). The prepared package is about **1.9 GB**. Download the complete package, unzip it if needed, and copy these folders into your cloned project's `data/` folder:
 
@@ -72,6 +102,6 @@ Pitch-table IDs are integers; other source columns retain their original text. C
 
 The downloads come from Baseball Savant's CSV exports and the MLB Stats API. The entry point is `scripts/ingest_statcast.py`; this project does not use PyBaseball. Coverage, preparation and known gaps are recorded in the [dataset card](dataset-card.md). The analysis design and table columns are in [methodology.md](methodology.md) and [data-contract.md](data-contract.md).
 
-Google Drive is the current handoff. No Hugging Face dataset has been published, and `scripts/download_dataset.py` is a Hugging Face downloader, not a Google Drive downloader. If we use Hugging Face later, set `dataset-lock.json` to the exact dataset commit and checksum manifest before using it.
+GitHub Releases provides the reduced CSV working package; Google Drive retains the original archive. No Hugging Face dataset has been published, and `scripts/download_dataset.py` is a Hugging Face downloader, not a downloader for these packages. If we use Hugging Face later, set `dataset-lock.json` to the exact dataset commit and checksum manifest before using it.
 
-The Drive upload does not change the source's license: no open redistribution license or written permission has been recorded. Keep that unresolved status separate from where the files are stored. See the [MLB data notice](https://gdx.mlb.com/components/copyright.txt) and [source terms](https://www.mlb.com/official-information/terms-of-use).
+The data uploads do not change the source's license: no open redistribution license or written permission has been recorded. Keep that unresolved status separate from where the files are stored. See the [MLB data notice](https://gdx.mlb.com/components/copyright.txt) and [source terms](https://www.mlb.com/official-information/terms-of-use).

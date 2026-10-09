@@ -4,7 +4,11 @@ Summarize how hard each Triple-A hitter hits the ball and the angles at which it
 
 ## Data
 
-Download the Google Drive package using the [README](https://github.com/AnishAwasthi/callup#readme). Use `data/parquet/AAA/`, saved team information, and `data/processed/hitter_seasons.csv`. Try `data/local_sample/` first. You can start without waiting for Person 1.
+Download [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) and unzip it to get `callup-csv/`.
+
+Use the files inside the unzipped `callup-csv` folder: `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv`, and `data/processed/hitter_seasons.csv`. Filter pitches to `in_cohort=True`, identify qualifying batted balls, calculate exit-velocity, hard-hit, launch-angle, and measurement-coverage statistics per player-season, and join to all 926 study rows using `batter = player_id` and matching `season`.
+
+The two CSVs in `data/local_sample/` are an optional five-player practice sample; check calculations there, then run on the full files. Keep missing measurements and outcomes blank rather than replacing them with zero. You can start without waiting for Person 1.
 
 ## Work
 
