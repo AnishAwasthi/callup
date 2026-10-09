@@ -1,7 +1,7 @@
-# Offline demo
+# Sample for checking setup
 
-These **synthetic** invented players and pitches test installation, joins and the shared contract. They are not evidence about baseball, representative data, or a sample for model evaluation. `data_kind=synthetic` is carried in every row. Counts/labels are invented independently of the 96 toy pitches.
+These players and pitches are **invented**. They let you check installation and player-ID matching without downloading the full dataset. They are not for baseball analysis.
 
-Run `python scripts/offline_example.py` with no network or API cache.
+Run `python scripts/offline_example.py` from the project folder. The example has 8 player-seasons and 96 pitches and needs no network connection.
 
-The genuine 13-player-season sample and 14,067 AAA pitches are generated at `data/local_sample/` by `scripts/prepare_analysis.py`. They remain outside Git pending source redistribution permission; use `--sample-dir data/local_sample` on the preparation machine. Public access to an endpoint does not establish a redistribution license. See `docs/data-access.md`.
+The Google Drive package also contains a **real-data sample**: 13 player-seasons and 14,067 Triple-A pitches. Copy its `local_sample/` folder into `data/`, then run `python scripts/offline_example.py --sample-dir data/local_sample`. See the main README for the Drive link and setup steps.

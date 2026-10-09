@@ -12,7 +12,7 @@ license_name: MLB source terms; redistribution clearance pending
 license_link: https://www.mlb.com/official-information/terms-of-use
 ---
 
-# Callup dataset card — local draft, not published
+# Callup dataset card
 
 ## Provenance and intended use
 
@@ -22,13 +22,13 @@ Source endpoints: `https://baseballsavant.mlb.com/statcast_search/csv` (MLB), `h
 
 ## Rights and access status
 
-**Redistribution clearance pending. No upload is authorized by this draft.** Source records do not inherit any license applied to project code. The [MLB data notice](https://gdx.mlb.com/components/copyright.txt) and [MLB terms](https://www.mlb.com/official-information/terms-of-use) must be reviewed against the intended use. Document actual permission, license scope and permitted recipients here before publishing. A private Hub repo is an access setting, not permission to redistribute. There is no established open-data license for this release.
+**Storage:** Anish reports that the prepared package is uploaded to the shared Google Drive folder linked in the README. There is no Hugging Face dataset repository. **Source redistribution clearance remains unresolved.** Source records do not inherit any license applied to project code. The [MLB data notice](https://gdx.mlb.com/components/copyright.txt) and [MLB terms](https://www.mlb.com/official-information/terms-of-use) must be reviewed against the intended use. Document actual permission, license scope and permitted recipients here before publishing. A private Hub repo is an access setting, not permission to redistribute. There is no established open-data license for this release.
 
 ## Coverage and contents
 
 The preserved archive has 1,009 gzip CSV shards: 457 requested AAA/mixed-minors dates and 552 MLB dates, spanning 2023–2025, totaling 4,754,688 rows. **The requested AAA directory includes Single-A Florida State League records and is not a pure AAA dataset.** True levels are derived from both opponents using year-specific team metadata; `COL` is ambiguous and resolved by intersection of both teams' level candidates. `reports/storage.json` records exact true-level counts, coverage, linkage, warnings and audit results. MLB uses 2,145,111 rows; the requested minors feed has 2,609,577 rows. Scheduled export dates match the cached schedule. One 2023 MLB resumed-game date is header-only; the corresponding game is present under its official earlier date. Date coverage alone does not prove every pitch/PA is present upstream.
 
-Directories in a permitted release:
+Directories in the prepared package:
 
 | Directory | Contents / schema |
 |---|---|
@@ -36,12 +36,12 @@ Directories in a permitted release:
 | cache | frozen Stats API JSON responses needed for offline reconstruction |
 | parquet/AAA, parquet/MLB | one Zstandard-compressed Parquet per source shard; same row/column order, nullable int64 IDs, other tokens as text |
 | processed | hitter_seasons.csv/parquet and preparation_report.json, 2023–2024 feature seasons |
-| local_sample | small genuine hitter-season sample, full selected AAA pitch histories and a real player trace |
+| local_sample | small real hitter-season sample, full selected AAA pitch histories and a real player trace |
 | checksums.json | versioned SHA-256/byte manifest of all payload files |
 
 The player-season contract in the code repository defines every column, missing value and split. Numeric `player_id` is MLBAM ID; raw hitter linkage uses `batter`. The primary player-season key is `(player_id, season)`; the pitch key adds `game_pk, at_bat_number, pitch_number`. ID linkage and roundtrip cell/null equality are verified. A small **synthetic** demo is separately in the code repository; never mix it with this real dataset.
 
-True-level audit counts: AAA 691,656 (2023), 675,342 (2024), 671,257 (2025), totaling 2,038,255; Single-A 571,322. Gzip CSV occupies 1,019,835,496 bytes; staging Parquet 827,539,483 bytes. Initial player-season table: 926 rows, 443 observed next-season MLB batting participants, 239 eligible/provisional outcomes, 204 thin participants and 483 without observed batting PA. Player-disjoint training has 208 pool rows/62 labels; test 456/125; excluded overlap 262/52. The genuine sample has 13 player-seasons and 14,067 observed AAA pitches. Exact release size and all hashes are in the manifest.
+True-level audit counts: AAA 691,656 (2023), 675,342 (2024), 671,257 (2025), totaling 2,038,255; Single-A 571,322. Gzip CSV occupies 1,019,835,496 bytes; staging Parquet 827,539,483 bytes. Initial player-season table: 926 rows, 443 observed next-season MLB batting participants, 239 eligible/provisional outcomes, 204 thin participants and 483 without observed batting PA. Player-disjoint training has 208 pool rows/62 labels; test 456/125; excluded overlap 262/52. The real sample has 13 player-seasons and 14,067 observed AAA pitches. Exact release size and all hashes are in the manifest.
 
 ## Preparation and reproduction
 

@@ -31,10 +31,10 @@ Published Issue links are in `docs/assignments.md`; local bodies in `docs/issues
 2. Run `python scripts/offline_example.py`, `pytest` and `ruff check .`. Expect eight **synthetic** player-seasons and 96 toy pitches in the demo; this verifies setup, not analysis.
 3. Open `docs/data-contract.md`, find your Issue and make a task branch using `docs/git-workflow.md`.
 4. Create a brief methodology note or script scaffold, commit it, push the branch and open a draft PR. Add the issue link and ask Anish for review.
-5. For genuine work, use the approved data release and locked downloader when available. On Anish's preparation machine, `data/local_sample/` and `data/processed/` are ready. Public teammate data access is still blocked by source permission; do not describe the handoff as complete until a permitted release/access route is tested.
+5. Download the dataset from the shared Google Drive folder linked in the README. Copy the five data folders into `data/`, then run `python scripts/offline_example.py --sample-dir data/local_sample`. Confirm that each teammate can access the Drive folder; the upload has been reported by Anish, but teammate access has not been independently tested.
 
 ## Suggested agenda (45 minutes)
 
 5 min project/baseball overview; 10 min cohort, timing, selection and provisional outcome caveats; 15 min setup exercise; 10 min assignment/dependency review; 5 min agree first PR review and unblock data access. GitHub basics: Issues are tasks, branches are isolated work, commits are checkpoints, PRs request review, and main is the integrated code. Bring blockers into the Issue/PR rather than inventing undocumented definitions in a private file.
 
-Current data access recommendation: preserve original gzip CSV; use Parquet for repeated scans. Hugging Face is a potential free distribution route, but do not upload until source redistribution is cleared and namespace/visibility/capacity are chosen. See `docs/data-access.md` for the exact steps. No full models, final feature suite, park system or Streamlit app are built in preparation.
+The dataset is now on the shared Google Drive. Preserve the original compressed CSV files and use Parquet for pitch analysis. See `docs/data-access.md` for setup. Source redistribution permission remains unresolved; Google Drive is a storage choice, not a license. Features, models and the park analysis are the team's next work.

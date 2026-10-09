@@ -1,72 +1,77 @@
-# Data access and reproducible workflow
+# Working with the data
 
-## Hosting decision, checked October 6, 2026
+## Download from Google Drive
 
-Use Parquet for repeated analysis, preserve gzip CSV as the source archive, and keep all full data outside the code repository. The prepared local package is `data/release/`; its published metadata/checksums are `reports/release_checksums.json` and `reports/release_summary.json`. It is not uploaded.
+Anish has uploaded the dataset to the [team's shared Google Drive folder](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link). The prepared package is about **1.9 GB**. Download the complete package, unzip it if needed, and copy these folders into your cloned project's `data/` folder:
 
-[Hugging Face's current storage policy](https://huggingface.co/docs/hub/storage-limits) lists free-account private storage as **100 GB account-wide** and public storage as **best effort**, not a guaranteed unlimited quota. Existing stored data consumes that allowance. Paid tiers can charge for extra storage. Our approximately 2 GB bundle is small relative to the free allowance, but account capacity must be checked before upload. Do not subscribe, enable add-ons, pay-as-you-go or compute Spaces. A plain dataset repository needs no training/inference service.
+| Folder | What it contains |
+|---|---|
+| `raw/` | Original daily pitch downloads, saved as compressed CSV (`.csv.gz`) |
+| `cache/` | Saved MLB API responses, so analysis can run without fetching them again |
+| `parquet/` | Compact copies of the pitch tables for Python analysis |
+| `processed/` | The prepared table of 926 player-seasons, in CSV and Parquet |
+| `local_sample/` | A smaller real-data sample for checking your code |
 
-Source suitability is unresolved. [Savant links to MLB terms](https://baseballsavant.mlb.com/); those terms require permission for redistribution. The [MLB data notice](https://gdx.mlb.com/components/copyright.txt) permits individual, noncommercial, nonbulk use and requires prior written authorization for other uses. I found no source-specific open redistribution license. This is evidence to request clearance, not a legal determination about every statistical fact. Public availability and a private repository do not establish permission to share the archive. Do not assign CC0/MIT to third-party data, upload the raw/converted archive, or commit a real sample until the applicable rights are established. The code repository therefore carries a synthetic sample; the genuine sample and trace remain local.
+Keep the folder structure: for example, `parquet/AAA/` should become `data/parquet/AAA/`, not `data/release/parquet/AAA/`. Keep `checksums.json` and `provenance.json` with your downloaded package; they identify its contents and preparation version. The trusted file hashes are also committed in `reports/release_checksums.json`, with the manifest hash in `reports/release_summary.json`. Compare against those records if checking a transfer.
 
-## What Anish should do for Hugging Face
+GitHub includes a separate **invented-data demo** in `data/sample/`. That demo checks installation; use the downloaded data for baseball analysis. The full data folders are excluded from Git. The uploaded package includes an older README; use this repository's current README for setup.
 
-1. Obtain a written source permission or identify a specific applicable license that covers this archive, derived tables and teammate access. Keep the evidence and approved scope. If unavailable, use a permitted independently acquired source; don't publish this bundle. Source download commands here are for authorized users, not a claim that bulk fetching is permitted.
-2. Log into the existing Hugging Face account. Choose a namespace/name, for example `<your-account>/callup-statcast-2023-2025`, and **private** for a controlled team workflow or **public** only if the cleared rights allow it. For controlled sharing, a free organization with each teammate as a `read` member is a practical option under the [current organization access rules](https://huggingface.co/docs/hub/organizations-security); check access before the meeting. Fine-grained resource groups require paid plans and are unnecessary here. Never share one token among teammates.
-3. In account/organization settings, confirm it is a free plan, current storage usage and at least the bundle's total remaining free capacity. Confirm permission for all recipients. Stop if the interface proposes an upgrade or charge. Free storage is account-wide and version history can retain old files.
-4. Review `docs/dataset-card.md`, resolve the rights status and license metadata honestly, regenerate a reviewed release, then create a **Dataset** repository on the Hub's New Dataset page. No Space is needed. Use a scoped write token only on the publishing machine (interactive `hf auth login`); do not paste it into this chat or commit it. Upload the reviewed tree with `hf upload <namespace/name> data/release-new . --repo-type dataset`. The explicit `.` installs it at repository root so the downloader finds `checksums.json`. This command must wait for clearance and the account choices above.
-5. Obtain the full 40-character commit SHA from the uploaded dataset's commit history. Open `checksums.json` at that revision. Its SHA-256 must match the local release summary. Set `dataset-lock.json` to the real repo ID, that exact SHA and `manifest_sha256`; commit the lock to the code repository. Never use `main` or a floating tag as the download pin.
-6. Have a teammate with their own read access run the downloader and offline example. Download from the pinned commit, verify hashes and test access before declaring the data handoff ready.
+## Open a table and check your setup
 
-The preparation does not create a Hugging Face repo because the user asked for an evaluation first and no redistribution permission/repo choice was supplied. The lock is explicitly unconfigured and the downloader fails with an actionable message; it does not quietly fetch latest data. A true pinned download is pending publication, not claimed completed.
-
-## Full workflow once a permitted release exists
-
-From a fresh clone, install the tested Python 3.13 environment using the README. With a populated lock:
+Follow the installation steps in the README, then run:
 
 ```bash
-# Public data requires no login. Private data: each teammate uses their own read token.
-hf auth login
-python scripts/download_dataset.py --install
 python scripts/offline_example.py --sample-dir data/local_sample
-python scripts/cohort_report.py --offline --all-thresholds
+```
+
+Expect 13 player-seasons and 14,067 Triple-A pitches. This checks that the sample loads and its player IDs match.
+
+For an Excel overview, open `data/processed/hitter_seasons.csv`. For Python:
+
+```python
+import pandas as pd
+
+hitters = pd.read_parquet("data/processed/hitter_seasons.parquet")
+print(hitters.head())
+```
+
+You can start from the supplied tables. You do not need to rerun ingestion or conversion. If you need to rebuild them from the preserved downloads:
+
+```bash
 python scripts/prepare_storage.py
 python scripts/prepare_analysis.py
 ```
 
-The download resolves every file at the locked commit, verifies the pinned manifest SHA plus each file's size/hash, and only then installs. It refuses to overwrite different existing inputs. Downloads land in ignored `data/incoming/`; verified source files go into `data/raw/`, API responses into `data/cache/`, staging files into `data/parquet/`, and the hitter table into `data/processed/`. Regenerating Parquet is optional if the verified release already includes it. The checksum comparison locks exact supplied bytes; reproducing byte-identical Parquet in another library version is not guaranteed, so conversion correctness also uses cell-by-cell comparison and the tested dependency lock.
+These use the downloaded archive and saved API responses; they preserve the original compressed CSV files.
 
-For a permitted non-Hub handoff, copy the same release tree through an approved team storage channel. Compare `checksums.json` to the trusted SHA in `reports/release_summary.json`, verify every entry, and copy its `raw`, `cache`, `parquet`, `processed`, `local_sample` directories into `data/`. Preserve relative paths. A transfer destination and access policy still need approval; this is not authorization to redistribute.
+## Calculate features from pitch data
 
-## Local reproducibility on the preparation machine
-
-```bash
-python scripts/cohort_report.py --offline --all-thresholds --json
-python scripts/prepare_storage.py       # all shards; offline metadata cache; no source writes
-python scripts/prepare_analysis.py      # 2023–2024 hitters; provisional labels; no final features
-python scripts/offline_example.py --sample-dir data/local_sample
-git status  # Commit reviewed preparation code before packaging its exact code revision.
-python scripts/package_dataset.py --output data/release-new
-```
-
-The original cache had only 2024 team metadata. Preparation fetched ten missing season-level team responses for 2023/2025; no pitch files were redownloaded. To reproduce from a fresh raw archive without the release cache, an authorized metadata refresh is `StatsAPI().team_level_candidates(year)` for each year; this does not fix incomplete outcomes automatically. Record any refresh separately and rerun reports.
-
-Week 1 feature readers can select a small set of columns:
+Process the daily files one at a time rather than loading the full archive into memory. **The `AAA` folder includes Single-A games too.** Use our team metadata to select actual Triple-A games:
 
 ```python
 from pathlib import Path
 import pandas as pd
 from callup.ingest import derive_levels
 from callup.statsapi import StatsAPI
-from callup.contract import load
 
-cohort = load('data/processed/hitter_seasons.csv')
 api = StatsAPI(offline=True)
-paths = sorted(Path('data/parquet/AAA').glob('2023-*.parquet'))
-for path in paths:  # stream shards; avoid loading all 4.75M rows into RAM
-    day = pd.read_parquet(path, columns=['batter', 'game_date', 'home_team', 'away_team', 'events', 'launch_speed'])
-    day = day.loc[derive_levels(day, api.team_level_candidates(2023)).eq('AAA')]
-    day['launch_speed'] = pd.to_numeric(day.launch_speed, errors='raise')
-    # Accumulate your assigned features by batter and season here.
+for season in (2023, 2024):
+    teams = api.team_level_candidates(season)
+    for path in sorted(Path("data/parquet/AAA").glob(f"{season}-*.parquet")):
+        day = pd.read_parquet(path, columns=[
+            "batter", "game_date", "home_team", "away_team", "events", "launch_speed"
+        ])
+        day = day.loc[derive_levels(day, teams).eq("AAA")]
+        day["launch_speed"] = pd.to_numeric(day["launch_speed"], errors="raise")
+        # Aggregate your assigned statistics by batter and season here.
 ```
 
-The `COL` abbreviation is ambiguous between AAA Columbus and Single-A Columbia. Candidate intersection across both opponents resolves real archive rows; unresolved pairs are null and must be investigated. A single-code map is unsafe.
+Pitch-table IDs are integers; other source columns retain their original text. Convert measurement columns to numbers before arithmetic. Missing measurements stay missing. Build features for every player-season in the prepared table, not just the few players you manually validate.
+
+## Background and sharing status
+
+The downloads come from Baseball Savant's CSV exports and the MLB Stats API. The entry point is `scripts/ingest_statcast.py`; this project does not use PyBaseball. Coverage, preparation and known gaps are recorded in the [dataset card](dataset-card.md). The analysis design and table columns are in [methodology.md](methodology.md) and [data-contract.md](data-contract.md).
+
+Google Drive is the current handoff. No Hugging Face dataset has been published, and `scripts/download_dataset.py` is a Hugging Face downloader, not a Google Drive downloader. If we use Hugging Face later, set `dataset-lock.json` to the exact dataset commit and checksum manifest before using it.
+
+The Drive upload does not change the source's license: no open redistribution license or written permission has been recorded. Keep that unresolved status separate from where the files are stored. See the [MLB data notice](https://gdx.mlb.com/components/copyright.txt) and [source terms](https://www.mlb.com/official-information/terms-of-use).

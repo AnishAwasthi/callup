@@ -42,4 +42,4 @@ assert row.outcome_year == 2024
 print(row[['aaa_pa', 'aaa_observed_pa', 'mlb_pa', 'mlb_observed_pa', 'mlb_woba']])
 ```
 
-Recreate the outcome from MLB 2024 Parquet shards selecting `batter==664770` and nonmissing events, sum numeric served weights/denominators, and compare to the trace within floating roundoff. The preparation script performs that aggregation over all shards and retains sums. A mismatch between observed PA and cached official PA is a documented measurement limitation, not patched to force equality. The trace is local pending redistribution clearance; no source records are published in the public code repository.
+Recreate the outcome from MLB 2024 Parquet shards selecting `batter==664770` and nonmissing events, sum numeric served weights/denominators, and compare to the trace within floating roundoff. The preparation script performs that aggregation over all shards and retains sums. A mismatch between observed PA and cached official PA is a documented measurement limitation, not patched to force equality. The trace is included in the Google Drive package under `local_sample/`; no source records are committed to the public code repository.

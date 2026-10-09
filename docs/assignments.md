@@ -10,4 +10,4 @@ Use your role placeholder until names/handles are supplied. Each Issue includes 
 | Person 4 | [Mean baseline/Ridge infrastructure](https://github.com/AnishAwasthi/callup/issues/4) |
 | Person 5 | [MLB participation/selection descriptions](https://github.com/AnishAwasthi/callup/issues/5) |
 
-Complete the README offline exercise and follow `docs/git-workflow.md`; use a fork if you have not been granted push access. Teammates own these implementations. Real dataset access remains pending source permission; public synthetic fixtures support setup and scaffolding, not genuine baseball results.
+Follow the README to install the project and download the real dataset from the shared Google Drive folder. Find your task in the table above, work on a branch, and open a pull request for Anish to review. If you need help with branches or forks, see `docs/git-workflow.md`. The invented sample in GitHub is only for checking setup.
