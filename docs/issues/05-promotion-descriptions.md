@@ -1,18 +1,27 @@
-# Person 5: Describe next-season MLB participation and outcome selection
+# Person 5: Summarize who plays in MLB the following year
 
-Owner: Person 5 (handle pending). Inputs: all rows of `data/processed/hitter_seasons.csv` and shared contract/methodology; preliminary AAA counts are sufficient. Download the prepared hitter-season table from the shared Google Drive package using the README. The invented GitHub sample is for checking setup only. Do not wait for final features or labels to begin.
+Describe which Triple-A hitters play in MLB next season, and how much usable information we have about them.
 
-Deliver a runnable descriptive script or notebook plus `docs/promotion-analysis.md`; generated tables/figures go into ignored `data/processed/promotion/`. Summary schema: `season`, `outcome_status`, integer `n_rows, n_players, n_reached, n_eligible, n_label_available`, numeric `participation_rate, eligibility_rate, label_rate`. Missingness schema: `season, field, n_missing, n_total, missing_rate`. Document player-season vs unique-player denominators.
+## Data
 
-Describe class balance, preliminary feature distributions and missingness by season and selection state. Make 2–4 clear plots, for example participation/eligibility counts by season, missingness heatmap, AAA PA distribution by participation and usable-label share. Separate next-season MLB batting PA>0 from MLB PA≥75 and from a reconstructible provisional wOBA. `not_observed` is window-specific, not never promoted in a career. Include all pool rows; never restrict descriptions to labeled players.
+Download the Google Drive package using the [README](https://github.com/AnishAwasthi/callup#readme). Use **all 926 rows** in `data/processed/hitter_seasons.csv`. You can start independently of the other four tasks.
 
-Optional simple logistic regression predicts next-season participation with only pre-outcome AAA features. If attempted, use the agreed player-disjoint split, train-only preprocessing and appropriate class-balance metrics; don't infer causal promotion effects or selection-correction validity. Descriptive plots are the required work, logistic regression is optional.
+## Work
 
-Dependencies: the prepared hitter-season table from Google Drive; independent of Persons 1–4. Coordinate selection definitions with Anish. No final selection correction or app required.
+- Count three groups separately: players with any next-season MLB batting appearances, those with at least 75 appearances, and those with usable preliminary wOBA values.
+- Compare their Triple-A statistics and missing measurements.
+- Make **2–4 clear plots**, such as group counts by season, Triple-A playing time by MLB participation, and missing-value rates.
+- Include nonparticipants. No batting appearances next season does not mean a player never reached MLB; participants can include returning MLB players.
+- Distinguish player-season rows from unique people: one hitter can contribute two seasons.
 
-Acceptance:
+## Deliver
 
-- Counts reconcile to shared report (926 pool, 239 workload-eligible; other counts from regenerated report), with unique-player counts separately stated.
-- Missing values remain missing; zero MLB PA represents no observed batting participation, not an imputed outcome.
-- 2–4 readable, labeled plots and summaries on real data, with sample/revision/caveats identified; synthetic runs labeled as demo only.
-- Key uniqueness and all-class inclusion checks, reproducible command, passing CI and focused PR linked to this Issue.
+A runnable script or notebook and `docs/promotion-analysis.md`. Save plots and tables under `data/processed/promotion/`; explain the sample, data version, and limitations. See the [output columns](https://github.com/AnishAwasthi/callup/blob/main/docs/data-contract.md#participation-summary-output).
+
+## Check before submitting
+
+Match counts to `reports/cohort_preparation.json`, including 926 player-seasons and 239 meeting the MLB playing-time threshold. Cover every group, keep missing values blank, and make the plots reproducible.
+
+Open a pull request linked to this issue, with GitHub checks passing. Keep generated outputs out of Git.
+
+Optional: try a simple participation model using Triple-A information and the agreed split. The plots are the required work; they do not establish why players were promoted.

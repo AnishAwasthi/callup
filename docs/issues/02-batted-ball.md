@@ -1,17 +1,25 @@
-# Person 2: Build and validate batted-ball features
+# Person 2: Calculate batted-ball stats
 
-Owner: Person 2 (handle pending). Read methodology/contract and complete the README offline exercise. Inputs: real `data/parquet/AAA` pitch shards with `batter, game_date, home_team, away_team, game_pk, at_bat_number, pitch_number, events, type, launch_speed, launch_angle`, frozen team metadata and the shared hitter-season cohort. Download the shared Google Drive package using the README. Start with `data/local_sample/` to check your code, then run on the full study data; the invented GitHub sample is only for checking setup.
+Summarize how hard each Triple-A hitter hits the ball and the angles at which it leaves the bat.
 
-Deliver a runnable feature script, methodology/validation note and ignored `data/processed/features_batted.csv` or `.parquet`. Schema: unique integer `player_id, season`; nullable floats `ev_mean, ev_p90, ev_max` (mph), `hard_hit_rate` (fraction), `la_mean, la_median, la_std` (degrees); integer `n_bbe, n_ev, n_la, n_hard_hit`; nullable fractions `ev_coverage, la_coverage`. State percentile interpolation and SD convention.
+## Data
 
-Filter true AAA with both opponent candidates, restrict to feature-year dates and deduplicate event keys before aggregation. Define a batted-ball event explicitly; avoid counting nonterminal/foul measurements twice. Parse raw staging strings as numbers with errors raised. Hard hit is EV ≥95 mph; its denominator is valid-EV batted balls. Missing EV/LA never becomes zero. Keep all cohort rows via a one-to-one left join, with explicit missing coverage and null stats for no measurements. Source measurements may include upstream estimates.
+Download the Google Drive package using the [README](https://github.com/AnishAwasthi/callup#readme). Use `data/parquet/AAA/`, saved team information, and `data/processed/hitter_seasons.csv`. Try `data/local_sample/` first. You can start without waiting for Person 1.
 
-Dependencies: contract and permitted raw data; independent of Person 1 features. Person 4 will consume these after review. No park adjustment or modeling required.
+## Work
 
-Acceptance:
+- Calculate average, 90th-percentile, and maximum **exit velocity** (ball speed off the bat, in mph).
+- Calculate **hard-hit rate**: the share of measured batted balls hit at least 95 mph.
+- Calculate average, median, and standard deviation of **launch angle** (the ball's angle off the bat).
+- Report how many batted balls have usable measurements. Missing values stay missing, rather than becoming zero.
+- Use actual Triple-A games in 2023–2024, define which events count as batted balls, and avoid counting repeated or foul-ball records twice.
 
-- CLI works on real small sample/full inputs offline; identical schema regardless of outcome class.
-- Validate several real players (at least 3), showing raw selected BBE, valid measurement counts, manual arithmetic and percentile/maximum checks.
-- Confirm min EV ≤mean/p90≤max where defined, hard-hit rate in [0,1], and correct zero-denominator behavior.
-- Document missingness and coverage by season; no selection on `label_available`, no future fields.
-- Focused duplicate/missing-value validation, passing CI and PR linked to this Issue. Commit code/docs/tests only.
+## Deliver
+
+A runnable script, `data/processed/features_batted.csv` (or Parquet), and a short calculation note. Include **all 926 player-seasons**, leaving unavailable measurements blank. See the [required output columns](https://github.com/AnishAwasthi/callup/blob/main/docs/data-contract.md#batted-ball-output). Person 4 can use the results after review.
+
+## Check before submitting
+
+Run on the full study data and manually check **3–5 players**. Show their batted balls, measurement counts, and calculations. Check valid ranges, duplicate events, and missing values; explain measurement coverage by season.
+
+Open a pull request linked to this issue, with GitHub checks passing. Keep generated data out of Git.
