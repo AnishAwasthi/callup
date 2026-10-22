@@ -11,7 +11,7 @@ pitches = pd.concat(
 )
 
 # Keep only pitches from players in our study
-pitches = pitches[pitches["in_cohort"] == True]
+pitches = pitches[pitches["in_cohort"]]
 
 # Show the first five rows
 print(pitches.head())
