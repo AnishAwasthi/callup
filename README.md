@@ -24,7 +24,7 @@ The example uses **invented data** included in GitHub to check that your setup w
 
 ## Get the real data
 
-The setup command above downloads the team's CSV files from a fixed GitHub Release, checks them, and puts them in `data/`. **No folder copying, Parquet setup, or Google Drive download is needed for team tasks.**
+The setup command above downloads the existing **14 MB CSV package** from a fixed GitHub Release, checks it, and puts its files in `data/`. **No folder copying, Parquet setup, or Google Drive download is needed for team tasks.**
 
 Already have a clone? Keep it. From that project folder, run:
 
@@ -37,7 +37,7 @@ Use the same Python environment as before. The command can be repeated; it leave
 
 Start with **`data/processed/hitter_seasons.csv`**: 926 rows, one per player and Triple-A season. You can open it in Excel. For pitch analysis, use `data/pitches/aaa_2023.csv` and `aaa_2024.csv`; these already contain only actual Triple-A games. Issues #1–#2 select `in_cohort=True`; issue #3 uses all AAA rows and `data/teams.csv`. Join using `batter = player_id` and matching `season`. Keep missing values blank.
 
-The same pitch CSVs now include **speed, spin, and movement**. Matching `mlb_2023.csv`, `mlb_2024.csv`, and `mlb_2025.csv` files are in `data/pitches/` for MLB comparisons. The CSVs in `data/local_sample/` are an optional five-player practice sample. Read CSVs directly; run final analyses on full files.
+The CSVs in `data/local_sample/` are an optional five-player practice sample. The published package covers the original five issues; expanded speed/spin/movement CSVs are prepared locally but not yet published. Read CSVs directly; run final analyses on full files.
 
 [Data instructions](docs/data-access.md) describe the columns and reproducible download. Large data stay outside Git history; cloning or pulling alone gets code and the invented sample. The original archive is preserved for source audits.
 

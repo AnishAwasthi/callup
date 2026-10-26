@@ -27,4 +27,4 @@ Run on the full study data, then manually check **3–5 players**, including a C
 
 Open a pull request linked to this issue, with GitHub checks passing. Commit code and notes; keep generated data out of Git.
 
-The same AAA CSVs now also include pitch speed, spin and movement. Optional follow-up pitch-context research can use them with the installed `data/pitches/mlb_2023.csv` and `mlb_2024.csv`; the basic-feature deliverable is unchanged.
+The published working CSVs cover this basic-feature task. Expanded pitch-context CSVs are prepared locally but not yet published; speed/spin/movement follow-up work is separate from this deliverable.

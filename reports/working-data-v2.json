@@ -256,5 +256,7 @@
       "bytes": 11247,
       "sha256": "036a716b0139cdb0d21548d9ba701e7560b5501ba09a99b34af4af4dc5b4476b"
     }
-  }
+  },
+  "upload_status": "not_published_automatic_approval_rejected",
+  "upload_blocker": "Expanded public payload not explicitly authorized; source redistribution rights remain unresolved."
 }

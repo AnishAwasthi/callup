@@ -1,6 +1,6 @@
 {
-  "release": "callup-csv-v2",
-  "url": "https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v2/callup-csv.zip",
-  "bytes": 183118624,
-  "sha256": "d7f10b50e2a0313e35a7c6ae1e8ad8bee24d764bc6d21d62486e2a6a12bb1858"
+  "release": "callup-csv-v1",
+  "url": "https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip",
+  "bytes": 13931904,
+  "sha256": "ed659ee9b8046b957d95ea45979e56db5acc67ca3c041ec898681ef1c2cccee2"
 }

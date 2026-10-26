@@ -15,7 +15,7 @@ Use `data/processed/hitter_seasons.csv` in your project folder: its existing Tri
 - Follow the existing `split` column: train on its 2023 training rows and test on its 2024 test rows. Verify that no player appears in both sets.
 - Fit and evaluate only rows with `label_available=True`. Use Triple-A information as predictors, without future MLB information or player IDs. Do not invent missing outcomes.
 - Learn missing-value replacements and scaling from training data only. Keep test data out of model tuning.
-- Verify the prepared MLB wOBA values used as outcomes. Start with 3–5 players and compare against an independent season-level reference, recording its source and season. Extend the comparison to eligible rows where reference values are available; explain differences and mark unresolved cases. The installed MLB pitch CSVs can support source investigations; they do not replace an independent reference. Coordinate interpretation or outcome changes with Anish.
+- Verify the prepared MLB wOBA values used as outcomes. Start with 3–5 players and compare against an independent season-level reference, recording its source and season. Extend the comparison to eligible rows where reference values are available; explain differences and mark unresolved cases. The original archive linked in the data-access notes can support source investigations; it does not replace an independent reference. Coordinate interpretation or outcome changes with Anish.
 
 ## Deliver
 

@@ -9,13 +9,15 @@ from scripts.download_working_data import install, safe_path
 from scripts.package_working_data import EXTRA, KEYS, append_context
 
 
-def package(tmp_path, payloads=None, bad_hash=False, extra_path=None):
+def package(tmp_path, payloads=None, bad_hash=False, extra_path=None, legacy=False):
     payloads = payloads or {"data/pitches/aaa_2024.csv": b"batter,speed\n1,95.00\n"}
     archive = tmp_path / "test.zip"
     manifest = {"files": {name: {"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
                           for name, data in payloads.items()}}
     if bad_hash:
         manifest["files"][next(iter(payloads))]["sha256"] = "0" * 64
+    if legacy:
+        manifest = {"exports": [{"path": name, **entry} for name, entry in manifest["files"].items()]}
     with ZipFile(archive, "w", ZIP_DEFLATED) as output:
         output.writestr("callup-csv/manifest.json", json.dumps(manifest))
         for name, data in payloads.items():
@@ -51,6 +53,12 @@ def test_bad_zip_checksum_installs_nothing(tmp_path):
     with pytest.raises(ValueError, match="ZIP failed"):
         install(archive, lock, tmp_path / "clone")
     assert not (tmp_path / "clone/data/pitches").exists()
+
+
+def test_existing_public_csv_release_manifest_supported(tmp_path):
+    archive, lock = package(tmp_path, legacy=True)
+    install(archive, lock, tmp_path / "clone")
+    assert (tmp_path / "clone/data/pitches/aaa_2024.csv").read_bytes() == b"batter,speed\n1,95.00\n"
 
 
 def test_bad_member_hash_installs_nothing(tmp_path):

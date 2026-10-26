@@ -65,8 +65,11 @@ def install(archive, lock, root):
             if not member.filename.startswith(prefix) or stat.S_ISLNK(member.external_attr >> 16):
                 raise ValueError("Unexpected package root or symlink")
         manifest = json.loads(package.read(prefix + "manifest.json"))
+        entries = manifest.get("files")
+        if entries is None:
+            entries = {entry["path"]: entry for entry in manifest["exports"]}
         verified = []
-        for name, expected in manifest["files"].items():
+        for name, expected in entries.items():
             safe_path(name)
             member = package.getinfo(prefix + name)
             if member.file_size != expected["bytes"]:
@@ -103,7 +106,7 @@ def install(archive, lock, root):
             installed += 1
         receipt = destination(root, "data/incoming/working-data-installed.json")
         receipt.write_text(json.dumps({"release": lock["release"], "sha256": lock["sha256"],
-                                       "files": manifest["files"]}, indent=2) + "\n")
+                                       "files": entries}, indent=2) + "\n")
         print(f"Team CSV data ready: {installed} installed, {unchanged} already current.")
         if backed_up:
             print(f"Preserved {backed_up} previous inputs in data/incoming/backups/.")
