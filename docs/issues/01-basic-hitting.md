@@ -4,9 +4,9 @@ Calculate useful hitting statistics for every player-season in our Triple-A stud
 
 ## Data
 
-Download [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) and unzip it to get `callup-csv/`.
+From your existing cloned project, run `git pull --no-rebase origin main`, then `python scripts/download_working_data.py`. This installs the CSVs in the right folders; no re-clone, manual copying, Google Drive, or Parquet setup is needed.
 
-Use the files inside the unzipped `callup-csv` folder: `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv`, and `data/processed/hitter_seasons.csv`. Filter pitches to `in_cohort=True`, calculate PA, strikeout, walk, swing, and contact rates per player-season, and join to all 926 study rows using `batter = player_id` and matching `season`.
+Use the installed files: `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv`, and `data/processed/hitter_seasons.csv`. Filter pitches to `in_cohort=True`, calculate PA, strikeout, walk, swing, and contact rates per player-season, and join to all 926 study rows using `batter = player_id` and matching `season`.
 
 The two CSVs in `data/local_sample/` are an optional five-player practice sample; check calculations there, then run on the full files. Keep missing measurements and outcomes blank rather than replacing them with zero. You can start independently of the other tasks.
 
@@ -26,3 +26,5 @@ A runnable script, `data/processed/features_basic.csv` (or Parquet), and a short
 Run on the full study data, then manually check **3–5 players**, including a Columbus hitter. Show the arithmetic and explain differences from saved API totals. Check duplicate rows, zero denominators, rates between 0 and 1, and contacts no greater than swings.
 
 Open a pull request linked to this issue, with GitHub checks passing. Commit code and notes; keep generated data out of Git.
+
+The same AAA CSVs now also include pitch speed, spin and movement. Optional follow-up pitch-context research can use them with the installed `data/pitches/mlb_2023.csv` and `mlb_2024.csv`; the basic-feature deliverable is unchanged.

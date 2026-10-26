@@ -20,7 +20,7 @@ jobs:
           python - <<'PY'
           import pathlib, subprocess
           files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
-          forbidden = ('data/raw/', 'data/cache/', 'data/parquet/', 'data/processed/', 'data/release/', 'data/local_sample/', 'data/incoming/')
+          forbidden = ('data/raw/', 'data/cache/', 'data/parquet/', 'data/pitches/', 'data/teams.csv', 'data/processed/', 'data/release/', 'data/local_sample/', 'data/incoming/')
           assert not any(p.startswith(forbidden) or p.endswith(('.parquet', '.csv.gz')) for p in files)
           assert not any(pathlib.Path(p).is_file() and pathlib.Path(p).stat().st_size > 5_000_000 for p in files)
           PY

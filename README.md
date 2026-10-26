@@ -14,6 +14,7 @@ cd callup
 python3.13 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-lock.txt
+python scripts/download_working_data.py
 python scripts/offline_example.py
 ```
 
@@ -23,15 +24,22 @@ The example uses **invented data** included in GitHub to check that your setup w
 
 ## Get the real data
 
-Download the [CSV working-data ZIP](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) (about **14 MB**, or 113 MB unzipped) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1). It contains the files needed for issues #1–#5.
+The setup command above downloads the team's CSV files from a fixed GitHub Release, checks them, and puts them in `data/`. **No folder copying, Parquet setup, or Google Drive download is needed for team tasks.**
 
-Unzip it to get `callup-csv/`. Copy the contents of its `data/` folder into this project's `data/` folder, or work directly inside `callup-csv/`. Keep the package's README, `manifest.json`, and `reports/cohort_preparation.json` for instructions and checking totals.
+Already have a clone? Keep it. From that project folder, run:
 
-Start with **`data/processed/hitter_seasons.csv`**: 926 rows, one per player and Triple-A season. You can open it in Excel. For pitch analysis, use `data/pitches/aaa_2023.csv` and `aaa_2024.csv`; these are already filtered to actual Triple-A games. Issues #1–#2 should select `in_cohort=True`; issue #3 uses all pitch rows and `data/teams.csv`. Join hitter features using `batter = player_id` and matching `season`. Keep missing measurements and outcomes blank.
+```bash
+git pull --no-rebase origin main
+python scripts/download_working_data.py
+```
 
-The two CSVs in `data/local_sample/` are an **optional five-player practice sample**. Read these CSVs directly; the older `offline_example.py --sample-dir` loader expects the original archive's schema. Run final analyses on the full files.
+Use the same Python environment as before. The command can be repeated; it leaves current files alone and backs up older inputs before updating them. It does not change your generated feature tables or code.
 
-[Data instructions](docs/data-access.md) cover loading and verification. The original **1.9 GB** archive remains in the [shared Google Drive folder](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link) for source audits and additional research.
+Start with **`data/processed/hitter_seasons.csv`**: 926 rows, one per player and Triple-A season. You can open it in Excel. For pitch analysis, use `data/pitches/aaa_2023.csv` and `aaa_2024.csv`; these already contain only actual Triple-A games. Issues #1–#2 select `in_cohort=True`; issue #3 uses all AAA rows and `data/teams.csv`. Join using `batter = player_id` and matching `season`. Keep missing values blank.
+
+The same pitch CSVs now include **speed, spin, and movement**. Matching `mlb_2023.csv`, `mlb_2024.csv`, and `mlb_2025.csv` files are in `data/pitches/` for MLB comparisons. The CSVs in `data/local_sample/` are an optional five-player practice sample. Read CSVs directly; run final analyses on full files.
+
+[Data instructions](docs/data-access.md) describe the columns and reproducible download. Large data stay outside Git history; cloning or pulling alone gets code and the invented sample. The original archive is preserved for source audits.
 
 ## Team work
 

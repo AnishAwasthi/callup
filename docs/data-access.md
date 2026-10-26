@@ -1,107 +1,50 @@
-# Working with the data
+# Get the team data
 
-## Download the CSV working data
+Keep your existing clone. From the project folder, update the code and install the data:
 
-The [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) includes [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip): about **14 MB** compressed and **113 MB** unzipped. It is the working package for issues #1–#5.
+```bash
+git pull --no-rebase origin main
+python scripts/download_working_data.py
+```
 
-Unzip it to get `callup-csv/`. Copy its `data/` contents into the cloned project's `data/` folder, or use the unzipped folder as your working directory. Retain the included README, `manifest.json`, and `reports/cohort_preparation.json`. The manifest records individual table hashes; the release's `.sha256` attachment records the ZIP hash.
+Use the Python environment from the README. The downloader needs only standard Python, no GitHub account, API token, or new service. It downloads the pinned `callup-csv-v2` GitHub Release, verifies the ZIP and file checksums, and installs the CSVs in the right folders. There is no manual unzipping or folder copying.
 
-| Input | Use |
+The package is about **183 MB** compressed. It contains the existing study data plus speed, spin, movement and MLB comparison files. Cloning/pulling downloads code and the invented demo; running the second command downloads the real data. No re-clone is needed.
+
+## Which file to open
+
+| File | Use |
 |---|---|
-| `data/processed/hitter_seasons.csv` | All 926 study player-seasons; primary input for issues #4–#5 |
-| `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv` | Actual Triple-A pitches; issues #1–#2 select `in_cohort=True`, while issue #3 uses all rows |
-| `data/teams.csv` | Issue #3's starting team/venue lookup; verify historical mappings |
-| `data/local_sample/hitter_seasons.csv`, `data/local_sample/pitches.csv` | Optional five-player practice sample, with 6,617 pitches; do not append it to full data |
-| `reports/cohort_preparation.json` | Issue #5's totals check |
+| `data/processed/hitter_seasons.csv` | All 926 player-seasons; starting table for modeling, participation summaries, and the player page |
+| `data/pitches/aaa_2023.csv`, `aaa_2024.csv` | Actual Triple-A pitches. Issues #1/#2 select `in_cohort=True`; park research uses all rows |
+| `data/pitches/mlb_2023.csv`, `mlb_2024.csv`, `mlb_2025.csv` | All archived MLB pitches for league comparisons and source checks; these files have no `in_cohort` flag |
+| `data/teams.csv` | Starting team/venue lookup; historical venue mappings still need verification |
+| `data/local_sample/hitter_seasons.csv`, `pitches.csv` | Optional five-player practice sample; run final analyses on full files |
 
-Read the reduced CSVs directly, for example:
+## Read the CSVs
 
 ```python
 import pandas as pd
 
 hitters = pd.read_csv("data/processed/hitter_seasons.csv", keep_default_na=False, na_values=[""])
 pitches = pd.read_csv("data/pitches/aaa_2023.csv", keep_default_na=False, na_values=[""])
-cohort_pitches = pitches.loc[pitches["in_cohort"].eq(True)]
+study_pitches = pitches.loc[pitches["in_cohort"].eq(True)]
 ```
 
-Aggregate hitter features by `batter, season`, then attach them to all 926 study rows using `batter = player_id` and matching `season`. Empty cells mean missing, not zero. Outcomes and the existing split are unchanged; wOBA and venue mappings remain provisional.
+Group hitter features by `batter, season` and join to the study table using `batter = player_id` and the matching season. Empty cells mean missing, not zero. Existing outcomes, split assignments, pitch keys and original AAA columns are unchanged from the first CSV release. The older sample-loader command expects the original archive's different sample format; read these working CSVs directly.
 
-The older `offline_example.py --sample-dir` loader expects the original archive's sample schema and does not load this reduced package. No API/cache download or Parquet conversion is needed for normal CSV analysis. Keep the CSV inputs and generated data out of Git.
+For Eva's pitch analysis, the added columns include `pitch_type`, `release_speed` (mph), `release_spin_rate` (rpm), `pfx_x` and `pfx_z` (movement in feet, catcher perspective). Location, pitcher handedness, extension, spin axis and served wOBA components are also included. Match pitch types and seasons when comparing AAA with MLB. Only pre-prediction information can become a predictor; following-year MLB data are for outcomes and evaluation.
 
-## Original archive on Google Drive
+## Updating an older installation
 
-The remaining setup, sample-loader, and source-rebuilding instructions on this page apply to the **original larger archive**, retained for audits and additional research. They are not required for the reduced CSV package.
+Run the same two commands. Files already matching this release are left alone. Differing downloaded inputs are backed up under `data/incoming/backups/` before replacement. Generated feature tables, model outputs and your scripts are not changed. The installer never copies the package README or reports over repository files.
 
-Anish has uploaded the dataset to the [team's shared Google Drive folder](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link). The prepared package is about **1.9 GB**. Download the complete package, unzip it if needed, and copy these folders into your cloned project's `data/` folder:
+The new ZIP is saved under `data/incoming/`. The committed `working-data-lock.json` fixes the release URL and SHA-256; `reports/working-data-v2.json` lists table checksums and coverage. To use a ZIP downloaded separately, run `python scripts/download_working_data.py --archive /path/to/callup-csv.zip`.
 
-| Folder | What it contains |
-|---|---|
-| `raw/` | Original daily pitch downloads, saved as compressed CSV (`.csv.gz`) |
-| `cache/` | Saved MLB API responses, so analysis can run without fetching them again |
-| `parquet/` | Compact copies of the pitch tables for Python analysis |
-| `processed/` | The prepared table of 926 player-seasons, in CSV and Parquet |
-| `local_sample/` | A smaller real-data sample for checking your code |
+All full data paths are ignored by Git, so the data download does not create Git conflicts. Commit code, notes and small invented fixtures only. The older `download_dataset.py` is a separate, unconfigured Hugging Face downloader and is not needed here.
 
-Keep the folder structure: for example, `parquet/AAA/` should become `data/parquet/AAA/`, not `data/release/parquet/AAA/`. Keep `checksums.json` and `provenance.json` with your downloaded package; they identify its contents and preparation version. The trusted file hashes are also committed in `reports/release_checksums.json`, with the manifest hash in `reports/release_summary.json`. Compare against those records if checking a transfer.
+## Original archive and reproduction
 
-GitHub includes a separate **invented-data demo** in `data/sample/`. That demo checks installation; use the downloaded data for baseball analysis. The full data folders are excluded from Git. The uploaded package includes an older README; use this repository's current README for setup.
+Anish's original compressed CSVs, Parquet copies and API cache are preserved locally and in the [Google Drive archive](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link). Teammates do not need those folders for the current tasks. This release adds columns from the preserved archive; it does not fetch new seasons or refresh outcomes. wOBA and venue mappings remain provisional; the [dataset card](dataset-card.md) records source limitations and the unresolved redistribution-license status.
 
-## Open a table and check your setup
-
-Follow the installation steps in the README, then run:
-
-```bash
-python scripts/offline_example.py --sample-dir data/local_sample
-```
-
-Expect 13 player-seasons and 14,067 Triple-A pitches. This checks that the sample loads and its player IDs match.
-
-For an Excel overview, open `data/processed/hitter_seasons.csv`. For Python:
-
-```python
-import pandas as pd
-
-hitters = pd.read_parquet("data/processed/hitter_seasons.parquet")
-print(hitters.head())
-```
-
-You can start from the supplied tables. You do not need to rerun ingestion or conversion. If you need to rebuild them from the preserved downloads:
-
-```bash
-python scripts/prepare_storage.py
-python scripts/prepare_analysis.py
-```
-
-These use the downloaded archive and saved API responses; they preserve the original compressed CSV files.
-
-## Calculate features from pitch data
-
-Process the daily files one at a time rather than loading the full archive into memory. **The `AAA` folder includes Single-A games too.** Use our team metadata to select actual Triple-A games:
-
-```python
-from pathlib import Path
-import pandas as pd
-from callup.ingest import derive_levels
-from callup.statsapi import StatsAPI
-
-api = StatsAPI(offline=True)
-for season in (2023, 2024):
-    teams = api.team_level_candidates(season)
-    for path in sorted(Path("data/parquet/AAA").glob(f"{season}-*.parquet")):
-        day = pd.read_parquet(path, columns=[
-            "batter", "game_date", "home_team", "away_team", "events", "launch_speed"
-        ])
-        day = day.loc[derive_levels(day, teams).eq("AAA")]
-        day["launch_speed"] = pd.to_numeric(day["launch_speed"], errors="raise")
-        # Aggregate your assigned statistics by batter and season here.
-```
-
-Pitch-table IDs are integers; other source columns retain their original text. Convert measurement columns to numbers before arithmetic. Missing measurements stay missing. Build features for every player-season in the prepared table, not just the few players you manually validate.
-
-## Background and sharing status
-
-The downloads come from Baseball Savant's CSV exports and the MLB Stats API. The entry point is `scripts/ingest_statcast.py`; this project does not use PyBaseball. Coverage, preparation and known gaps are recorded in the [dataset card](dataset-card.md). The analysis design and table columns are in [methodology.md](methodology.md) and [data-contract.md](data-contract.md).
-
-GitHub Releases provides the reduced CSV working package; Google Drive retains the original archive. No Hugging Face dataset has been published, and `scripts/download_dataset.py` is a Hugging Face downloader, not a downloader for these packages. If we use Hugging Face later, set `dataset-lock.json` to the exact dataset commit and checksum manifest before using it.
-
-The data uploads do not change the source's license: no open redistribution license or written permission has been recorded. Keep that unresolved status separate from where the files are stored. See the [MLB data notice](https://gdx.mlb.com/components/copyright.txt) and [source terms](https://www.mlb.com/official-information/terms-of-use).
+Maintainers can rebuild from the unchanged original Parquet/cache folders and the frozen v1 ZIP using `python scripts/package_working_data.py --base-zip /path/to/callup-minimal-csv.zip --output data/incoming/new-build`. The script verifies all existing AAA values, keys, sample records and new CSV round trips, and records source hashes. Use a new release tag and update the lock after verifying any later package; do not replace a versioned asset in place.

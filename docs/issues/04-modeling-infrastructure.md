@@ -4,9 +4,9 @@ Build a simple starting point for predicting next-season MLB batting performance
 
 ## Data
 
-Download [callup-minimal-csv.zip](https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v1/callup-minimal-csv.zip) from the [GitHub Release](https://github.com/AnishAwasthi/callup/releases/tag/callup-csv-v1) and unzip it to get `callup-csv/`.
+From your existing cloned project, run `git pull --no-rebase origin main`, then `python scripts/download_working_data.py`. This installs the CSVs in the right folders; no re-clone, manual copying, Google Drive, or Parquet setup is needed.
 
-Use `data/processed/hitter_seasons.csv` inside the unzipped `callup-csv` folder: its existing Triple-A counts, provisional next-season MLB wOBA, and frozen `split` are enough to evaluate the training-average baseline and Ridge model using available labels. Keep missing outcomes blank rather than replacing them with zero. You can begin before Persons 1 and 2 finish.
+Use `data/processed/hitter_seasons.csv` in your project folder: its existing Triple-A counts, provisional next-season MLB wOBA, and frozen `split` are enough to evaluate the training-average baseline and Ridge model using available labels. Keep missing outcomes blank rather than replacing them with zero. You can begin before Persons 1 and 2 finish.
 
 ## Work
 
@@ -15,7 +15,7 @@ Use `data/processed/hitter_seasons.csv` inside the unzipped `callup-csv` folder:
 - Follow the existing `split` column: train on its 2023 training rows and test on its 2024 test rows. Verify that no player appears in both sets.
 - Fit and evaluate only rows with `label_available=True`. Use Triple-A information as predictors, without future MLB information or player IDs. Do not invent missing outcomes.
 - Learn missing-value replacements and scaling from training data only. Keep test data out of model tuning.
-- Verify the prepared MLB wOBA values used as outcomes. Start with 3–5 players and compare against an independent season-level reference, recording its source and season. Extend the comparison to eligible rows where reference values are available; explain differences and mark unresolved cases. The original archive linked in the README can support source investigations. Coordinate interpretation or outcome changes with Anish.
+- Verify the prepared MLB wOBA values used as outcomes. Start with 3–5 players and compare against an independent season-level reference, recording its source and season. Extend the comparison to eligible rows where reference values are available; explain differences and mark unresolved cases. The installed MLB pitch CSVs can support source investigations; they do not replace an independent reference. Coordinate interpretation or outcome changes with Anish.
 
 ## Deliver
 
