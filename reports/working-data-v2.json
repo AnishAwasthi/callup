@@ -1,6 +1,5 @@
 {
   "release": "callup-csv-v2",
-  "url": "https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v2/callup-csv.zip",
   "bytes": 183118624,
   "sha256": "d7f10b50e2a0313e35a7c6ae1e8ad8bee24d764bc6d21d62486e2a6a12bb1858",
   "base_release": "callup-csv-v1",
@@ -257,6 +256,9 @@
       "sha256": "036a716b0139cdb0d21548d9ba701e7560b5501ba09a99b34af4af4dc5b4476b"
     }
   },
-  "upload_status": "not_published_automatic_approval_rejected",
-  "upload_blocker": "Expanded public payload not explicitly authorized; source redistribution rights remain unresolved."
+  "upload_status": "git_tracked_snapshot",
+  "distribution": "data/shared; fetched with git pull; no Git LFS",
+  "shared_manifest": "data/shared/manifest.json",
+  "zip_published": false,
+  "prepared_zip_url_not_published": "https://github.com/AnishAwasthi/callup/releases/download/callup-csv-v2/callup-csv.zip"
 }

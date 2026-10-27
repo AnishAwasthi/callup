@@ -1,0 +1,6 @@
+player_id,name,season,outcome_year,prediction_date,aaa_pa,aaa_hits,aaa_ab,aaa_bb,aaa_k,aaa_hr,aaa_observed_pitches,aaa_observed_pa,aaa_first_date,aaa_last_date,mlb_pa,reached_mlb,outcome_eligible,label_available,mlb_woba,mlb_woba_numerator,mlb_woba_denom,mlb_observed_pa,mlb_first_date,mlb_last_date,outcome_status,split,label_provisional,data_kind
+501659,Abraham Almonte,2023,2024,2024-01-01,159,27,134,24,41,11,715,159,2023-05-09,2023-09-16,0,False,False,False,,0.0,0.0,0,,,not_observed,train,True,real
+542364,Rafael Ortega,2023,2024,2024-01-01,339,64,281,54,57,9,1458,339,2023-04-02,2023-07-30,17,True,False,False,,3.2,17.0,17,2024-04-26,2024-05-14,thin,excluded_overlap,True,real
+572138,Jon Singleton,2023,2024,2024-01-01,364,86,298,63,75,22,1453,364,2023-04-02,2023-08-06,405,True,True,True,0.3222084367245658,129.85000000000002,403.0,406,2024-03-28,2024-09-28,eligible,train,True,real
+678877,Jhonkensy Noel,2023,2024,2024-01-01,585,114,519,49,145,27,2331,586,2023-03-31,2023-09-23,198,True,True,True,0.3371212121212121,66.75,198.0,198,2024-06-26,2024-09-28,eligible,excluded_overlap,True,real
+578428,Jose Iglesias,2024,2025,2025-01-01,175,45,165,9,29,7,660,176,2024-03-29,2024-05-30,343,True,True,True,0.2980769230769232,100.75000000000004,338.0,343,2025-03-29,2025-09-28,eligible,test,True,real

@@ -25,3 +25,7 @@ data/incoming/
 
 # OS
 .DS_Store
+
+# Approved frozen working snapshot: compressed CSVs arrive with git pull.
+# Original archives and generated data above remain ignored.
+!data/shared/pitches/*.csv.gz

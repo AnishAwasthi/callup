@@ -33,7 +33,7 @@ Pitch key: `(game_pk, at_bat_number, pitch_number)` within source/date and level
 
 ## Teammate outputs
 
-Write generated full CSV/Parquet tables in ignored `data/processed/`. Commit scripts, docs and tests; use a small synthetic fixture for CI until real-source sharing is cleared. Every feature table has unique integer `player_id, season`, named numeric outputs, denominator/sample-count columns and documented null behavior. Do not drop unpromoted players when constructing features. Set a rate to null if its denominator is zero; distinguish no measurement from an observed zero.
+Write generated full CSV/Parquet tables in ignored `data/processed/`. Commit scripts, docs and tests; use small synthetic fixtures for new code tests. The user-approved frozen inputs in `data/shared/` are tracked and verified by CI; do not add other raw archives or generated tables to Git. Every feature table has unique integer `player_id, season`, named numeric outputs, denominator/sample-count columns and documented null behavior. Do not drop unpromoted players when constructing features. Set a rate to null if its denominator is zero; distinguish no measurement from an observed zero.
 
 Persons 1 and 2 should produce all cohort rows where possible, annotate missing coverage, and leave the central outcome/split fields to the shared table. Person 3's prototype table key is `(park_id, season)` or `(home_team, season)` until venue mapping is resolved, with factor scale, reference=1.0 or 100 explicitly documented. Do not silently duplicate player-season rows when joining parks.
 

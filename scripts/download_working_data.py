@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download the pinned team CSV package into this clone using only standard Python."""
+"""Legacy release installer; current shared CSVs already arrive with git pull."""
 from __future__ import annotations
 
 import argparse
@@ -115,11 +115,16 @@ def install(archive, lock, root):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--lock", type=Path, default=ROOT / "working-data-lock.json")
+    parser.add_argument("--lock", type=Path, help="explicit legacy release lock")
     parser.add_argument("--archive", type=Path, help="use an already downloaded ZIP (offline)")
     parser.add_argument("--output-root", type=Path, default=ROOT, help=argparse.SUPPRESS)
     args = parser.parse_args()
     root = args.output_root.resolve()
+    if args.lock is None and args.archive is None and (root / "data/shared/manifest.json").is_file():
+        print("The team data already arrived with Git; no download is needed.")
+        print("Use data/shared/processed/hitter_seasons.csv and data/shared/pitches/*.csv.gz.")
+        return
+    args.lock = args.lock or ROOT / "working-data-lock.json"
     try:
         lock = json.loads(args.lock.read_text())
         archive = args.archive

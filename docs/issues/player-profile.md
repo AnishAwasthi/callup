@@ -4,7 +4,7 @@ Create the first Streamlit page where someone can choose a Triple-A hitter and s
 
 ## Start
 
-This can begin now. Follow the [README](https://github.com/AnishAwasthi/callup#readme) to install the CSV working data. Start with `data/processed/hitter_seasons.csv`; you do not need to wait for the other feature or model tasks.
+This can begin now. Follow the [README](https://github.com/AnishAwasthi/callup#readme) for the CSV working data included with Git. Start with `data/shared/processed/hitter_seasons.csv`; you do not need to wait for the other feature or model tasks.
 
 ## Work
 
@@ -16,7 +16,7 @@ This can begin now. Follow the [README](https://github.com/AnishAwasthi/callup#r
 
 ## Deliver
 
-A working `app.py`, the display settings, and short launch instructions (`streamlit run app.py`). Add the required dependency. Keep the data source configurable so teammates can use their downloaded files.
+A working `app.py`, the display settings, and short launch instructions (`streamlit run app.py`). Add the required dependency. Keep the data source configurable, defaulting to the shared CSV paths.
 
 ## Check before submitting
 

@@ -1,49 +1,47 @@
-# Get the team data
+# Team data
 
-Keep your existing clone. From the project folder, update the code and install the data:
+## Get it with Git
+
+The approved working snapshot is included under **`data/shared/`**. Existing teammates only need to update their clone:
 
 ```bash
 git pull --no-rebase origin main
-python scripts/download_working_data.py
 ```
 
-Use the Python environment from the README. The downloader needs only standard Python, no GitHub account, API token, or new service. It downloads the pinned `callup-csv-v1` GitHub Release, verifies the ZIP and file checksums, and installs the CSVs in the right folders. There is no manual unzipping or folder copying.
+No separate downloader, unzipping, copying folders, Parquet, Git LFS, or API account is needed. The data are about 184 MB compressed, with each file below 50 MiB. Existing ignored data folders and generated work are not replaced. The older 14 MB GitHub Release and downloader remain for reproducibility, but they are no longer the default setup.
 
-The published package is about **14 MB** compressed and 113 MB uncompressed. It contains the study table and the CSV inputs for issues #1–#5. Cloning/pulling downloads code and the invented demo; running the second command downloads the real data. No re-clone is needed.
+## Which file to use
 
-## Which file to open
+All paths below are inside `data/shared/`:
 
 | File | Use |
 |---|---|
-| `data/processed/hitter_seasons.csv` | All 926 player-seasons; starting table for modeling, participation summaries, and the player page |
-| `data/pitches/aaa_2023.csv`, `aaa_2024.csv` | Actual Triple-A pitches. Issues #1/#2 select `in_cohort=True`; park research uses all rows |
-| `data/teams.csv` | Starting team/venue lookup; historical venue mappings still need verification |
-| `data/local_sample/hitter_seasons.csv`, `pitches.csv` | Optional five-player practice sample; run final analyses on full files |
+| `processed/hitter_seasons.csv` | All 926 study player-seasons; modeling, participation summaries, and player profiles |
+| `pitches/aaa_2023.csv.gz`, `aaa_2024.csv.gz` | Actual Triple-A pitches. Issues #1/#2 select `in_cohort=True`; park research uses all rows |
+| `pitches/mlb_2023.csv.gz`, `mlb_2024.csv.gz`, `mlb_2025.csv.gz` | MLB comparisons and source checks; no `in_cohort` flag |
+| `teams.csv` | Starting team/venue lookup; historical mappings still need verification |
+| `local_sample/hitter_seasons.csv`, `local_sample/pitches.csv` | Optional five-player practice sample; final analyses use full files |
 
-## Read the CSVs
+## Open a pitch table
 
 ```python
 import pandas as pd
 
-hitters = pd.read_csv("data/processed/hitter_seasons.csv", keep_default_na=False, na_values=[""])
-pitches = pd.read_csv("data/pitches/aaa_2023.csv", keep_default_na=False, na_values=[""])
+hitters = pd.read_csv("data/shared/processed/hitter_seasons.csv", keep_default_na=False, na_values=[""])
+pitches = pd.read_csv("data/shared/pitches/aaa_2024.csv.gz", keep_default_na=False, na_values=[""])
 study_pitches = pitches.loc[pitches["in_cohort"].eq(True)]
 ```
 
-Group hitter features by `batter, season` and join to the study table using `batter = player_id` and the matching season. Empty cells mean missing, not zero. The installer uses the original CSV release without changing its outcomes, split assignments, columns or values. The older sample-loader command expects the original archive's different sample format; read these working CSVs directly.
+Pandas decompresses `.csv.gz` automatically. Group features by `batter, season` and join using `batter = player_id` and matching `season`. Keep missing measurements blank. Read the practice CSVs directly; the older sample-loader script expects a different original-archive format.
 
-The public package does not include pitch speed, spin or movement. An expanded CSV package has been built locally with those fields and MLB comparison files, preserving every original AAA value. It is **not published**: automatic approval review rejected uploading the expanded public payload because authorization and source redistribution rights remain unresolved. The one-command installer therefore uses only the already published package. No additional data were uploaded as a workaround.
+For Eva's pitch analysis, select `pitch_type`, `release_speed` (mph), `release_spin_rate` (rpm), and `pfx_x`/`pfx_z` (movement in feet, catcher perspective). Handedness, location, extension, spin axis, and served wOBA components are also available. Compare matching seasons and pitch types. Following-year MLB measurements must not become predictors of that year's outcome.
 
-## Updating an older installation
+## Preserve the snapshot
 
-Run the same two commands. Files already matching this release are left alone. Differing downloaded inputs are backed up under `data/incoming/backups/` before replacement. Generated feature tables, model outputs and your scripts are not changed. The installer never copies the package README or reports over repository files.
+Treat `data/shared/` as read-only. Write generated tables, predictions and plots in ignored `data/processed/`. Old inputs under `data/pitches/` or `data/processed/` can stay; use the shared paths for the expanded input columns. The original raw archive, Parquet copies and API cache are preserved separately and are not required for ordinary team work.
 
-The new ZIP is saved under `data/incoming/`. The committed `working-data-lock.json` fixes the release URL and SHA-256; `reports/working-data-v2.json` records the checksums and pending publication status of the separate expanded package. To use a ZIP downloaded separately, run `python scripts/download_working_data.py --archive /path/to/callup-minimal-csv.zip`.
+`data/shared/manifest.json` records checksums for compressed files and the exact decompressed CSV bytes, row counts, columns and source version. Git's commit SHA identifies the exact snapshot; record it with experiments. CI verifies every shared data file. This is frozen historical data, not a live update of source seasons.
 
-All full data paths are ignored by Git, so the data download does not create Git conflicts. Commit code, notes and small invented fixtures only. The older `download_dataset.py` is a separate, unconfigured Hugging Face downloader and is not needed here.
+All original AAA values, IDs, missing positions, sample records and outcomes are unchanged from the v1 CSV release; extra pitch columns and MLB tables come from the preserved archive. Outcomes and venue mappings remain provisional. Source terms and unresolved source-specific redistribution-license status are documented in the [dataset card](dataset-card.md).
 
-## Original archive and reproduction
-
-Anish's original compressed CSVs, Parquet copies and API cache are preserved locally and in the [Google Drive archive](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link). Teammates do not need those folders for the current tasks. The pending expanded package adds columns from the preserved archive; it does not fetch new seasons or refresh outcomes. wOBA and venue mappings remain provisional; the [dataset card](dataset-card.md) records source limitations and the unresolved redistribution-license status.
-
-Maintainers can rebuild from the unchanged original Parquet/cache folders and the frozen v1 ZIP using `python scripts/package_working_data.py --base-zip /path/to/callup-minimal-csv.zip --output data/incoming/new-build`. The script verifies all existing AAA values, keys, sample records and new CSV round trips, and records source hashes. Use a new release tag and update the lock after verifying any later package; do not replace a versioned asset in place.
+Maintainers can reproduce the shared files from the verified expanded CSV package with `python scripts/prepare_shared_data.py --source /path/to/callup-csv --output /path/to/new-output`. It verifies source checksums, compresses pitches without changing their CSV bytes, and enforces a 50 MiB per-file budget. The underlying expanded package is reproducible with `scripts/package_working_data.py`; the full source archive remains on [Google Drive](https://drive.google.com/drive/folders/1WRWRfMqxtrhO1dX38Dc5pqrttF2wyu-W?usp=share_link).

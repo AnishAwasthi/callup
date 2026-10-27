@@ -1,0 +1,61 @@
+season,team_id,team_name,abbreviation,pitch_codes,league,default_venue_id,default_venue_name,venue_mapping_status,source_url
+2023,512,Toledo Mud Hens,TOL,TOL,International League,2767,Fifth Third Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,1410,Lehigh Valley IronPigs,LHV,LHV,International League,3230,Coca-Cola Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,451,Iowa Cubs,IOW,IOW,International League,2844,Principal Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,2310,Reno Aces,RNO,RNO,Pacific Coast League,3789,Greater Nevada Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,400,Las Vegas Aviators,LV,LV,Pacific Coast League,5355,Las Vegas Ballpark,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,529,Tacoma Rainiers,TAC,TAC,Pacific Coast League,2745,Cheney Stadium,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,531,Scranton/Wilkes-Barre RailRiders,SWB,SWB,International League,2797,PNC Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,533,Worcester Red Sox,WOR,WOR,International League,5410,Polar Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,534,Rochester Red Wings,ROC,ROC,International League,2773,Innovative Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,342,Albuquerque Isotopes,ABQ,ABQ,Pacific Coast League,2683,Isotopes Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,541,Omaha Storm Chasers,OMA,OMA,International League,4271,Werner Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,416,Louisville Bats,LOU,LOU,International League,2724,Louisville Slugger Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,484,Indianapolis Indians,IND,IND,International League,2858,Victory Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,422,Buffalo Bisons,BUF,BUF,International League,2756,Sahlen Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,102,Round Rock Express,RR,RR,Pacific Coast League,2528,Dell Diamond,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,4904,El Paso Chihuahuas,ELP,ELP,Pacific Coast League,4669,Southwest University Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,1960,St. Paul Saints,STP,STP,International League,5472,CHS Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,552,Syracuse Mets,SYR,SYR,International League,2823,NBT Bank Stadium,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,105,Sacramento River Cats,SAC,SAC,Pacific Coast League,2529,Sutter Health Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,234,Durham Bulls,DUR,DUR,International League,2541,Durham Bulls Athletic Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,235,Memphis Redbirds,MEM,MEM,International League,2542,AutoZone Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,556,Nashville Sounds,NAS,NAS,International League,4715,First Horizon Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,494,Charlotte Knights,CLT,CLT,International League,4670,Truist Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,238,Oklahoma City Dodgers,OKC,OKC,Pacific Coast League,2843,Chickasaw Bricktown Ballpark,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,431,Gwinnett Stripers,GWN,GWN,International League,3810,Coolray Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,561,Salt Lake Bees,SL,SL,Pacific Coast League,2772,Smith's Ballpark,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,564,Jacksonville Jumbo Shrimp,JAX,JAX,International League,2852,121 Financial Ballpark,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,568,Norfolk Tides,NOR,NOR,International League,2781,Harbor Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,5434,Sugar Land Space Cowboys,SUG,SUG,Pacific Coast League,5421,Constellation Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2023,445,Columbus Clippers,COL,COL,International League,3970,Huntington Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2023
+2024,512,Toledo Mud Hens,TOL,TOL,International League,2767,Fifth Third Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,1410,Lehigh Valley IronPigs,LHV,LHV,International League,3230,Coca-Cola Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,451,Iowa Cubs,IOW,IOW,International League,2844,Principal Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,2310,Reno Aces,RNO,RNO,Pacific Coast League,3789,Greater Nevada Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,400,Las Vegas Aviators,LV,LV,Pacific Coast League,5355,Las Vegas Ballpark,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,529,Tacoma Rainiers,TAC,TAC,Pacific Coast League,2745,Cheney Stadium,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,531,Scranton/Wilkes-Barre RailRiders,SWB,SWB,International League,2797,PNC Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,533,Worcester Red Sox,WOR,WOR,International League,5410,Polar Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,534,Rochester Red Wings,ROC,ROC,International League,2773,Innovative Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,342,Albuquerque Isotopes,ABQ,ABQ,Pacific Coast League,2683,Isotopes Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,541,Omaha Storm Chasers,OMA,OMA,International League,4271,Werner Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,416,Louisville Bats,LOU,LOU,International League,2724,Louisville Slugger Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,484,Indianapolis Indians,IND,IND,International League,2858,Victory Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,422,Buffalo Bisons,BUF,BUF,International League,2756,Sahlen Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,102,Round Rock Express,RR,RR,Pacific Coast League,2528,Dell Diamond,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,4904,El Paso Chihuahuas,ELP,ELP,Pacific Coast League,4669,Southwest University Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,1960,St. Paul Saints,STP,STP,International League,5472,CHS Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,552,Syracuse Mets,SYR,SYR,International League,2823,NBT Bank Stadium,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,105,Sacramento River Cats,SAC,SAC,Pacific Coast League,2529,Sutter Health Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,234,Durham Bulls,DUR,DUR,International League,2541,Durham Bulls Athletic Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,235,Memphis Redbirds,MEM,MEM,International League,2542,AutoZone Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,556,Nashville Sounds,NAS,NAS,International League,4715,First Horizon Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,494,Charlotte Knights,CLT,CLT,International League,4670,Truist Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,238,Oklahoma City Baseball Club,OKC,OKC,Pacific Coast League,2843,Chickasaw Bricktown Ballpark,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,431,Gwinnett Stripers,GWN,GWN,International League,3810,Coolray Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,561,Salt Lake Bees,SL,SL,Pacific Coast League,2772,Smith's Ballpark,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,564,Jacksonville Jumbo Shrimp,JAX,JAX,International League,2852,121 Financial Ballpark,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,568,Norfolk Tides,NOR,NOR,International League,2781,Harbor Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,5434,Sugar Land Space Cowboys,SUG,SUG,Pacific Coast League,5421,Constellation Field,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024
+2024,445,Columbus Clippers,COL,COL,International League,3970,Huntington Park,team season snapshot; game venue not verified,https://statsapi.mlb.com/api/v1/teams?sportId=11&season=2024

@@ -22,7 +22,7 @@ Source endpoints: `https://baseballsavant.mlb.com/statcast_search/csv` (MLB), `h
 
 ## Rights and access status
 
-**Storage:** Anish reports that the prepared package is uploaded to the shared Google Drive folder linked in the README. There is no Hugging Face dataset repository. **Source redistribution clearance remains unresolved.** Source records do not inherit any license applied to project code. The [MLB data notice](https://gdx.mlb.com/components/copyright.txt) and [MLB terms](https://www.mlb.com/official-information/terms-of-use) must be reviewed against the intended use. Document actual permission, license scope and permitted recipients here before publishing. A private Hub repo is an access setting, not permission to redistribute. There is no established open-data license for this release.
+**Storage:** The original package remains on Google Drive. Anish authorized the expanded working snapshot to be included in the public Git repository on October 26, 2026, conditional on delivery by `git pull`; it is stored under `data/shared/`. There is no Hugging Face dataset repository. **Source redistribution clearance remains unresolved.** Source records do not inherit any license applied to project code. The [MLB data notice](https://gdx.mlb.com/components/copyright.txt) and [MLB terms](https://www.mlb.com/official-information/terms-of-use) must be reviewed against the intended use. Document actual permission, license scope and permitted recipients here before publishing. A private Hub repo is an access setting, not permission to redistribute. There is no established open-data license for this release.
 
 ## Coverage and contents
 
@@ -58,3 +58,7 @@ Selection into MLB and into sufficient playing time is informative; unmeasured s
 Raw tracking, terminal-event and official PA counts can disagree, and missing tracking is not a zero measurement. Provisional wOBA requires independent reconciliation to official season outcomes; source event weights may differ from season-specific published weights. Cached API lines may differ from later corrected data. 2025 AAA →2026 outcomes are excluded because the cached 2026 lines are incomplete and no 2026 pitches were archived. Feature eligibility is not the same as an outcome value being verified. Park effects, team/venue mapping, age/experience controls and fair subgroup evaluation remain unfinished.
 
 No medical, financial or professional personnel decisions should be based on this research starter. No guarantee is made of source completeness or prospective availability of retrospectively computed fields. Retain the frozen revision, checksums, exact code revision and environment version in every experiment.
+
+## Shared CSV snapshot
+
+The Git-tracked working subset contains actual AAA pitches for 2023–2024, MLB pitches for 2023–2025, the unchanged 926-row study table, team metadata and the original five-player reduced practice sample. Pitch CSVs are gzip compressed; each decompressed table matches its verified expanded CSV byte for byte. Original AAA columns and sample records match the frozen v1 CSV release. `data/shared/manifest.json` records sizes, hashes, rows and columns. The larger archive's 13-player-season sample remains separate from the shared five-player sample. No source seasons or outcomes were refreshed for this packaging change.

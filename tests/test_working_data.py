@@ -1,11 +1,13 @@
 import hashlib
 import json
+import sys
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import pandas as pd
 import pytest
 
 from scripts.download_working_data import install, safe_path
+from scripts.download_working_data import main as download_main
 from scripts.package_working_data import EXTRA, KEYS, append_context
 
 
@@ -59,6 +61,17 @@ def test_existing_public_csv_release_manifest_supported(tmp_path):
     archive, lock = package(tmp_path, legacy=True)
     install(archive, lock, tmp_path / "clone")
     assert (tmp_path / "clone/data/pitches/aaa_2024.csv").read_bytes() == b"batter,speed\n1,95.00\n"
+
+
+def test_git_snapshot_needs_no_legacy_download(tmp_path, monkeypatch, capsys):
+    shared = tmp_path / "data/shared"
+    shared.mkdir(parents=True)
+    (shared / "manifest.json").write_text("{}")
+    monkeypatch.setattr(sys, "argv", ["download_working_data.py", "--output-root", str(tmp_path)])
+    monkeypatch.setattr("urllib.request.urlopen", lambda *a, **k: pytest.fail("Unexpected network"))
+    download_main()
+    assert "already arrived with Git" in capsys.readouterr().out
+    assert not (tmp_path / "data/incoming").exists()
 
 
 def test_bad_member_hash_installs_nothing(tmp_path):

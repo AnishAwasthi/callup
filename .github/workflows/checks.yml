@@ -15,12 +15,16 @@ jobs:
       - run: ruff check .
       - run: pytest
       - run: python scripts/offline_example.py
-      - name: Ensure source records and large data stay out of Git
+      - name: Allow only the approved shared snapshot; keep originals and outputs out of Git
         run: |
           python - <<'PY'
-          import pathlib, subprocess
+          import json, pathlib, subprocess
           files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+          shared = json.loads(pathlib.Path('data/shared/manifest.json').read_text())
+          allowed = {'data/shared/' + name for name in shared['files']}
           forbidden = ('data/raw/', 'data/cache/', 'data/parquet/', 'data/pitches/', 'data/teams.csv', 'data/processed/', 'data/release/', 'data/local_sample/', 'data/incoming/')
-          assert not any(p.startswith(forbidden) or p.endswith(('.parquet', '.csv.gz')) for p in files)
-          assert not any(pathlib.Path(p).is_file() and pathlib.Path(p).stat().st_size > 5_000_000 for p in files)
+          assert not any(p.startswith(forbidden) for p in files)
+          assert not any(p.endswith(('.parquet', '.csv.gz')) and p not in allowed for p in files)
+          assert not any(pathlib.Path(p).is_file() and pathlib.Path(p).stat().st_size > 5_000_000 and p not in allowed for p in files)
+          assert all(pathlib.Path(p).stat().st_size < 50 * 1024 * 1024 for p in allowed)
           PY

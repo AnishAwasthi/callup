@@ -4,11 +4,11 @@ Summarize how hard each Triple-A hitter hits the ball and the angles at which it
 
 ## Data
 
-From your existing cloned project, run `git pull --no-rebase origin main`, then `python scripts/download_working_data.py`. This installs the CSVs in the right folders; no re-clone, manual copying, Google Drive, or Parquet setup is needed.
+From your existing project, run `git pull --no-rebase origin main`. The data arrives automatically in `data/shared/`; no separate download, unzipping, copying, Git LFS, or API setup is needed. Pandas opens `.csv.gz` files directly.
 
-Use the installed files: `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv`, and `data/processed/hitter_seasons.csv`. Filter pitches to `in_cohort=True`, identify qualifying batted balls, calculate exit-velocity, hard-hit, launch-angle, and measurement-coverage statistics per player-season, and join to all 926 study rows using `batter = player_id` and matching `season`.
+Use the installed files: `data/shared/pitches/aaa_2023.csv.gz`, `data/shared/pitches/aaa_2024.csv.gz`, and `data/shared/processed/hitter_seasons.csv`. Filter pitches to `in_cohort=True`, identify qualifying batted balls, calculate exit-velocity, hard-hit, launch-angle, and measurement-coverage statistics per player-season, and join to all 926 study rows using `batter = player_id` and matching `season`.
 
-The two CSVs in `data/local_sample/` are an optional five-player practice sample; check calculations there, then run on the full files. Keep missing measurements and outcomes blank rather than replacing them with zero. You can start without waiting for Person 1.
+The two CSVs in `data/shared/local_sample/` are an optional five-player practice sample; check calculations there, then run on the full files. Keep missing measurements and outcomes blank rather than replacing them with zero. You can start without waiting for Person 1.
 
 ## Work
 

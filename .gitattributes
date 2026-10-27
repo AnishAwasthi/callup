@@ -1,0 +1,3 @@
+# Preserve shared-data bytes and checksums on every operating system.
+data/shared/** -text
+data/shared/pitches/*.csv.gz -diff

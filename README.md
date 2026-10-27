@@ -14,7 +14,6 @@ cd callup
 python3.13 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-lock.txt
-python scripts/download_working_data.py
 python scripts/offline_example.py
 ```
 
@@ -24,27 +23,31 @@ The example uses **invented data** included in GitHub to check that your setup w
 
 ## Get the real data
 
-The setup command above downloads the existing **14 MB CSV package** from a fixed GitHub Release, checks it, and puts its files in `data/`. **No folder copying, Parquet setup, or Google Drive download is needed for team tasks.**
-
-Already have a clone? Keep it. From that project folder, run:
+**The team data is included in the repository.** Already have a clone? From that project folder, run:
 
 ```bash
 git pull --no-rebase origin main
-python scripts/download_working_data.py
 ```
 
-Use the same Python environment as before. The command can be repeated; it leaves current files alone and backs up older inputs before updating them. It does not change your generated feature tables or code.
+That adds `data/shared/` automatically, including speed, spin, movement, and MLB comparison data. No re-clone, separate download, folder copying, Git LFS, or Parquet setup is needed. The initial data transfer is about **184 MB**. Your existing data folders and generated results are left alone.
 
-Start with **`data/processed/hitter_seasons.csv`**: 926 rows, one per player and Triple-A season. You can open it in Excel. For pitch analysis, use `data/pitches/aaa_2023.csv` and `aaa_2024.csv`; these already contain only actual Triple-A games. Issues #1–#2 select `in_cohort=True`; issue #3 uses all AAA rows and `data/teams.csv`. Join using `batter = player_id` and matching `season`. Keep missing values blank.
+Start with **`data/shared/processed/hitter_seasons.csv`**: 926 rows, one per player and Triple-A season. You can open it in Excel.
 
-The CSVs in `data/local_sample/` are an optional five-player practice sample. The published package covers the original five issues; expanded speed/spin/movement CSVs are prepared locally but not yet published. Read CSVs directly; run final analyses on full files.
+For pitch analysis, use `data/shared/pitches/aaa_2023.csv.gz` and `aaa_2024.csv.gz`. These are compressed CSVs; Python opens them directly:
 
-[Data instructions](docs/data-access.md) describe the columns and reproducible download. Large data stay outside Git history; cloning or pulling alone gets code and the invented sample. The original archive is preserved for source audits.
+```python
+import pandas as pd
+pitches = pd.read_csv("data/shared/pitches/aaa_2024.csv.gz")
+```
+
+The AAA files contain actual Triple-A games. Issues #1/#2 select `in_cohort=True`; park research uses all AAA rows and `data/shared/teams.csv`. MLB 2023–2025 comparison files are in the same pitch folder. Join hitter features using `batter = player_id` and matching `season`. Missing values stay missing.
+
+The CSVs in `data/shared/local_sample/` are an optional five-player practice sample. [Data instructions](docs/data-access.md) describe the fields and checksums. Write generated features and model outputs under ignored `data/processed/`; treat `data/shared/` as read-only. The full original archive remains preserved separately.
 
 ## Team work
 
 The initial five [GitHub issues](https://github.com/AnishAwasthi/callup/issues) cover basic hitting statistics, batted-ball statistics, ballpark research, a first prediction model, and summaries of who plays in MLB the following year.
 
-Build features for **all players in the study**; manually check 3–5 players to verify your calculations. Work on a separate branch and open a pull request for Anish to review. Commit code and notes; keep downloaded data and generated data files out of Git.
+Build features for **all players in the study**; manually check 3–5 players to verify your calculations. Work on a separate branch and open a pull request for Anish to review. Commit code and notes; keep generated data files and new source downloads out of Git. The approved frozen inputs in `data/shared/` are already tracked.
 
 When you need them, [study notes](docs/methodology.md) explain the analysis choices and [column definitions](docs/data-contract.md) explain the prepared table.

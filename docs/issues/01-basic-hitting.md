@@ -4,11 +4,11 @@ Calculate useful hitting statistics for every player-season in our Triple-A stud
 
 ## Data
 
-From your existing cloned project, run `git pull --no-rebase origin main`, then `python scripts/download_working_data.py`. This installs the CSVs in the right folders; no re-clone, manual copying, Google Drive, or Parquet setup is needed.
+From your existing project, run `git pull --no-rebase origin main`. The data arrives automatically in `data/shared/`; no separate download, unzipping, copying, Git LFS, or API setup is needed. Pandas opens `.csv.gz` files directly.
 
-Use the installed files: `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv`, and `data/processed/hitter_seasons.csv`. Filter pitches to `in_cohort=True`, calculate PA, strikeout, walk, swing, and contact rates per player-season, and join to all 926 study rows using `batter = player_id` and matching `season`.
+Use the installed files: `data/shared/pitches/aaa_2023.csv.gz`, `data/shared/pitches/aaa_2024.csv.gz`, and `data/shared/processed/hitter_seasons.csv`. Filter pitches to `in_cohort=True`, calculate PA, strikeout, walk, swing, and contact rates per player-season, and join to all 926 study rows using `batter = player_id` and matching `season`.
 
-The two CSVs in `data/local_sample/` are an optional five-player practice sample; check calculations there, then run on the full files. Keep missing measurements and outcomes blank rather than replacing them with zero. You can start independently of the other tasks.
+The two CSVs in `data/shared/local_sample/` are an optional five-player practice sample; check calculations there, then run on the full files. Keep missing measurements and outcomes blank rather than replacing them with zero. You can start independently of the other tasks.
 
 ## Work
 
@@ -27,4 +27,4 @@ Run on the full study data, then manually check **3–5 players**, including a C
 
 Open a pull request linked to this issue, with GitHub checks passing. Commit code and notes; keep generated data out of Git.
 
-The published working CSVs cover this basic-feature task. Expanded pitch-context CSVs are prepared locally but not yet published; speed/spin/movement follow-up work is separate from this deliverable.
+The same AAA files also contain speed, spin and movement. Matching MLB CSVs are in `data/shared/pitches/` for follow-up pitch-context research; the basic-feature deliverable is unchanged.

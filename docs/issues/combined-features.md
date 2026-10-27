@@ -8,7 +8,7 @@ The finished version needs reviewed outputs from #1 and #2. The joining code can
 
 ## Work
 
-- Write `scripts/combine_features.py` to join `data/processed/hitter_seasons.csv`, `features_basic.csv`, and `features_batted.csv` by `player_id` and `season`.
+- Write `scripts/combine_features.py` to join `data/shared/processed/hitter_seasons.csv`, `features_basic.csv`, and `features_batted.csv` by `player_id` and `season`.
 - Keep all 926 study rows, including players without next-season MLB outcomes. A missing feature must stay missing rather than removing the player or becoming zero.
 - Reject duplicate keys and unexpected player-seasons. Keep original reference counts separate from newly calculated counts; do not silently overwrite columns with the same name.
 - Preserve the existing outcome flags and training/test assignments. Keep outcome fields clearly separate from the list of inputs allowed in a model.

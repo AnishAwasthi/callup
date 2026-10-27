@@ -4,9 +4,9 @@ Recommend a practical way to account for Triple-A ballpark differences, then try
 
 ## Start
 
-From your existing cloned project, run `git pull --no-rebase origin main`, then `python scripts/download_working_data.py`. This installs the CSVs in the right folders; no re-clone, manual copying, Google Drive, or Parquet setup is needed.
+From your existing project, run `git pull --no-rebase origin main`. The data arrives automatically in `data/shared/`; no separate download, unzipping, copying, Git LFS, or API setup is needed. Pandas opens `.csv.gz` files directly.
 
-Begin with research; you do not need the dataset yet. For the small prototype, agree on a statistic with Anish and use `data/pitches/aaa_2023.csv`, `data/pitches/aaa_2024.csv`, and `data/teams.csv` in your project folder. Use **all pitch rows**, including hitters outside the study cohort; compare park-factor methods and verify historical venue mappings before treating the team metadata as a final venue map. Keep missing measurements and outcomes blank rather than replacing them with zero.
+Begin with research; you do not need the dataset yet. For the small prototype, agree on a statistic with Anish and use `data/shared/pitches/aaa_2023.csv.gz`, `data/shared/pitches/aaa_2024.csv.gz`, and `data/shared/teams.csv` in your project folder. Use **all pitch rows**, including hitters outside the study cohort; compare park-factor methods and verify historical venue mappings before treating the team metadata as a final venue map. Keep missing measurements and outcomes blank rather than replacing them with zero.
 
 ## Work
 
