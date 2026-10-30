@@ -2,11 +2,21 @@ import json
 import math
 import sys
 
+import numpy as np
 import pandas as pd
 import pytest
 
-from callup.modeling import regression_metrics, training_average_baseline
-from scripts import train_baseline
+from callup.contract import FEATURE_INPUTS
+from callup.modeling import (
+    RIDGE_ALPHAS,
+    compare_models,
+    fit_ridge,
+    regression_metrics,
+    ridge_pipeline,
+    select_features,
+    training_average_baseline,
+)
+from scripts import train_baseline, train_models
 
 
 @pytest.fixture
@@ -140,3 +150,134 @@ def test_cli_outputs(cohort, tmp_path, monkeypatch):
     assert metrics["outcome_validation"] == "independent_validation_pending"
     assert set(predictions.columns) == {"player_id", "season", "outcome_year", "split", "model", "y_true", "y_pred", "data_version", "code_version", "code_dirty"}
     assert len(predictions) == 2
+
+
+def compare(frame):
+    return compare_models(frame, data_version="fixture", code_version="test", code_dirty=True)
+
+
+@pytest.mark.parametrize("forbidden", ["player_id", "mlb_pa", "mlb_woba", "split", "season", "label_available", "data_kind"])
+def test_ridge_rejects_forbidden_predictors(cohort, forbidden):
+    with pytest.raises(ValueError, match="allowlist"):
+        select_features(cohort, [*FEATURE_INPUTS, forbidden])
+
+
+def test_feature_matrix_validation(cohort):
+    assert select_features(cohort).columns.tolist() == FEATURE_INPUTS
+    with pytest.raises(ValueError, match="Missing predictor"):
+        select_features(cohort.drop(columns="aaa_hr"))
+    with pytest.raises(ValueError, match="numeric"):
+        select_features(cohort.assign(aaa_hr="bad"))
+    with pytest.raises(ValueError, match="Infinite"):
+        select_features(cohort.assign(aaa_hr=math.inf))
+
+
+def test_pipeline_training_only_imputation_and_scaling():
+    train = pd.DataFrame({"aaa_pa": [150., 200., 250.], "aaa_hr": [1., np.nan, 5.]})
+    pipeline = ridge_pipeline().fit(train, [0.2, 0.3, 0.4])
+    np.testing.assert_allclose(pipeline["imputer"].statistics_, [200, 3])
+    np.testing.assert_allclose(pipeline["scaler"].mean_, [200, 3])
+    expected_scale = np.std([[150, 1], [200, 3], [250, 5]], axis=0)
+    np.testing.assert_allclose(pipeline["scaler"].scale_, expected_scale)
+    stats = pipeline["imputer"].statistics_.copy()
+    means = pipeline["scaler"].mean_.copy()
+    result = pipeline.predict(pd.DataFrame({"aaa_pa": [100000., np.nan], "aaa_hr": [np.nan, 1000.]}))
+    assert np.isfinite(result).all()
+    np.testing.assert_array_equal(pipeline["imputer"].statistics_, stats)
+    np.testing.assert_array_equal(pipeline["scaler"].mean_, means)
+
+
+def test_cv_fits_preprocessing_within_each_fold(cohort, monkeypatch):
+    from sklearn.impute import SimpleImputer
+    from sklearn.model_selection import GroupKFold
+
+    train = cohort.loc[cohort.split.eq("train") & cohort.label_available].copy()
+    train["aaa_hits"] = [10, 90]
+    seen = []
+    original = SimpleImputer.fit
+
+    def record_fit(self, X, y=None):
+        seen.append(tuple(X.aaa_hits))
+        return original(self, X, y)
+
+    monkeypatch.setattr(SimpleImputer, "fit", record_fit)
+    search = fit_ridge(train)
+    assert len(seen) == len(RIDGE_ALPHAS) * 2 + 1
+    assert seen.count((10, 90)) == 1  # Only the final refit sees all training rows.
+    assert set(seen[:-1]) == {(10,), (90,)}
+    for fit_indices, validation_indices in GroupKFold(2).split(train, groups=train.player_id):
+        assert not set(train.iloc[fit_indices].player_id) & set(train.iloc[validation_indices].player_id)
+    assert search.best_estimator_["imputer"].statistics_[1] == 50
+
+
+def test_grouped_cv_keeps_repeated_players_together(cohort):
+    train = cohort.loc[cohort.split.eq("train") & cohort.label_available]
+    repeated = pd.concat([train, train], ignore_index=True)
+    search = fit_ridge(repeated)
+    for fit_indices, validation_indices in search.cv.split(repeated, groups=repeated.player_id):
+        assert not set(repeated.iloc[fit_indices].player_id) & set(repeated.iloc[validation_indices].player_id)
+
+
+def test_ridge_test_data_cannot_influence_selection(cohort):
+    cohort.loc[cohort.split.eq("train") & cohort.label_available, "aaa_hits"] = [10, 90]
+    original, predictions = compare(cohort)
+    changed = cohort.copy()
+    changed.loc[changed.split.eq("test"), "aaa_hits"] = 10000
+    changed.loc[changed.split.eq("test") & changed.label_available, "mlb_woba"] = [0.8, 0.9]
+    changed.loc[changed.split.eq("excluded_overlap"), "mlb_woba"] = 0.01
+    changed.loc[~changed.label_available, "aaa_hits"] = 9999
+    updated, _ = compare(changed)
+    for key in ("selected_alpha", "cv_results", "fitted_preprocessing"):
+        assert original["models"]["ridge"][key] == updated["models"]["ridge"][key]
+    labels_only = cohort.copy()
+    labels_only.loc[labels_only.split.eq("test") & labels_only.label_available, "mlb_woba"] = [0.8, 0.9]
+    _, updated_predictions = compare(labels_only)
+    np.testing.assert_array_equal(predictions.y_pred, updated_predictions.y_pred)
+
+
+def test_comparison_deterministic_same_players_metrics_and_constant_features(cohort):
+    metrics, predictions = compare(cohort)
+    again, again_predictions = compare(cohort)
+    assert metrics == again
+    pd.testing.assert_frame_equal(predictions, again_predictions)
+    baseline = predictions.loc[predictions.model.eq("training_average")]
+    ridge = predictions.loc[predictions.model.eq("ridge")]
+    assert baseline.player_id.tolist() == ridge.player_id.tolist() == [4, 5]
+    assert baseline.y_true.tolist() == ridge.y_true.tolist()
+    assert ridge.y_pred.tolist() == pytest.approx([0.3, 0.3])
+    assert metrics["models"]["ridge"]["selected_alpha"] == RIDGE_ALPHAS[0]
+    expected = regression_metrics(ridge.y_true, ridge.y_pred)
+    for key, value in expected.items():
+        assert metrics["models"]["ridge"][key] == value
+    json.dumps(metrics, allow_nan=False)
+
+
+def test_ridge_requires_two_training_players(cohort):
+    with pytest.raises(ValueError, match="two training players"):
+        compare(cohort.loc[~cohort.player_id.eq(2)])
+
+
+def test_ridge_rejects_unlabeled_player_overlap(cohort):
+    cohort.loc[cohort.player_id.eq(3), "player_id"] = 6
+    with pytest.raises(ValueError, match="Player overlap"):
+        compare(cohort)
+
+
+def test_models_cli_outputs(cohort, tmp_path, monkeypatch):
+    script = tmp_path / "scripts/train_models.py"
+    script.parent.mkdir()
+    source = tmp_path / "fixture.csv"
+    cohort.to_csv(source, index=False)
+    monkeypatch.setattr(train_models, "__file__", str(script))
+    monkeypatch.setattr(sys, "argv", [str(script), "--input", str(source)])
+    monkeypatch.setattr(train_models.subprocess, "check_output", lambda args, **kwargs: "abc123\n" if args[1] == "rev-parse" else "?? changes\n")
+    train_models.main()
+    output = tmp_path / "data/processed"
+    metrics = json.loads((output / "model_metrics.json").read_text())
+    predictions = pd.read_csv(output / "predictions.csv")
+    assert set(metrics["models"]) == {"ridge", "training_average"}
+    assert metrics["preliminary"] is True
+    assert set(predictions.model) == {"ridge", "training_average"}
+    assert len(predictions) == 4
+    assert not predictions.duplicated(["player_id", "season", "model"]).any()
+    assert set(predictions.columns) == {"player_id", "season", "outcome_year", "split", "model", "y_true", "y_pred", "data_version", "code_version", "code_dirty"}
