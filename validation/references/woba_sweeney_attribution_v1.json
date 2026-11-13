@@ -1,0 +1,33 @@
+{
+  "capture_note": "Curated independent MLB facts supporting diagnosis only; no internal count correction applied.",
+  "retrieved_at": "2026-11-11T08:03:57+00:00",
+  "player_id": 700242,
+  "season": 2024,
+  "outcome_year": 2025,
+  "game_pk": 776366,
+  "game_date": "2025-09-12",
+  "archive_at_bat_number": 11,
+  "mlb_at_bat_index": 10,
+  "terminal_pitch_number": 5,
+  "official_game_pa": 3,
+  "official_game_ab": 3,
+  "archive_game_completed_pa": 4,
+  "archive_game_ab": 4,
+  "initial_batter_id": 595879,
+  "terminal_batter_id": 700242,
+  "substitution_count": {
+    "balls": 0,
+    "strikes": 2
+  },
+  "official_result_description": "Javier B\u00e1ez strikes out swinging.",
+  "source_urls": [
+    "https://statsapi.mlb.com/api/v1/people/700242/stats?stats=gameLog&group=hitting&season=2025&sportIds=1",
+    "https://statsapi.mlb.com/api/v1.1/game/776366/feed/live"
+  ],
+  "interpretation": "Inherited two-strike strikeout is officially attributed to Javier B\u00e1ez; terminal-pitch batter ID alone overcounts Sweeney AB/PA by one.",
+  "correction_applied": false,
+  "source_sha256": {
+    "mlb_sweeney_gamelog_2025.json": "07bdd39e13de163d50bcfef80d94ecb1d6fadf271970f4a978a1df58e0ff0361",
+    "mlb_game_776366.json": "21ac342afb00197d2f028a33ed4f1bd052bf1fb0ce557c3b2d7d583a481123ea"
+  }
+}
