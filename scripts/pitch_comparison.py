@@ -53,6 +53,10 @@ summary = (
     data.groupby(["year", "league", "pitch_type"])
     .agg(
         pitch_count=("pitch_type", "size"),
+        speed_count=("release_speed", "count"),
+        spin_count=("release_spin_rate", "count"),
+        horizontal_movement_count=("pfx_x", "count"),
+        vertical_movement_count=("pfx_z", "count"),
         avg_speed=("release_speed", "mean"),
         avg_spin=("release_spin_rate", "mean"),
         avg_horizontal_movement=("pfx_x", "mean"),
@@ -79,11 +83,17 @@ comparison = summary.pivot(
     columns="league",
     values=[
         "pitch_count",
+        "speed_count",
+        "spin_count",
+        "horizontal_movement_count",
+        "vertical_movement_count",
         "avg_speed",
         "avg_spin",
         "avg_horizontal_movement",
-        "avg_vertical_movement"
+        "avg_vertical_movement",
     ]
+
+    
 )
 
 comparison.columns = [
