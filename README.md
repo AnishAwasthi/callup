@@ -44,6 +44,33 @@ The AAA files contain actual Triple-A games. Issues #1/#2 select `in_cohort=True
 
 The CSVs in `data/shared/local_sample/` are an optional five-player practice sample. [Data instructions](docs/data-access.md) describe the fields and checksums. Write generated features and model outputs under ignored `data/processed/`; treat `data/shared/` as read-only. The full original archive remains preserved separately.
 
+## AAA vs. MLB pitch comparison
+
+This analysis compares pitch speed, spin rate, and horizontal and vertical movement between Triple-A and MLB during the 2023 and 2024 seasons.
+
+After completing the setup instructions above, run:
+
+```bash
+python scripts/pitch_comparison.py
+```
+
+The script reads the approved pitch datasets from `data/shared/pitches/` and generates three CSV files:
+
+- `data/processed/pitch_summary_2023_2024.csv`
+- `data/processed/aaa_mlb_pitch_comparison.csv`
+- `data/processed/common_pitch_comparison.csv`
+
+It also generates four graphs:
+
+- `reports/pitch_speed_2023.png`
+- `reports/pitch_speed_2024.png`
+- `reports/pitch_spin_2023.png`
+- `reports/pitch_spin_2024.png`
+
+The CSVs include valid observation counts for each measurement. These counts may differ because some pitches have missing speed, spin, or movement values.
+
+Generated CSVs belong in `data/processed/`, not `data/shared/`. The original shared datasets should remain unchanged.
+
 ## Team work
 
 The initial five [GitHub issues](https://github.com/AnishAwasthi/callup/issues) cover basic hitting statistics, batted-ball statistics, ballpark research, a first prediction model, and summaries of who plays in MLB the following year.
