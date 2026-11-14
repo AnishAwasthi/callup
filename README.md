@@ -78,3 +78,5 @@ The initial five [GitHub issues](https://github.com/AnishAwasthi/callup/issues) 
 Build features for **all players in the study**; manually check 3–5 players to verify your calculations. Work on a separate branch and open a pull request for Anish to review. Commit code and notes; keep generated data files and new source downloads out of Git. The approved frozen inputs in `data/shared/` are already tracked.
 
 When you need them, [study notes](docs/methodology.md) explain the analysis choices and [column definitions](docs/data-contract.md) explain the prepared table.
+
+Readable player summaries (#10) are generated offline with a local Hugging Face model; see [player summaries](docs/player-summary.md). Their extra packages are optional and listed in `requirements-llm.txt`.

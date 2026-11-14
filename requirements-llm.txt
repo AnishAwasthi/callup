@@ -1,0 +1,6 @@
+# Optional: only for generating player summaries (issue #10). CI and the app do not need it.
+# Install alongside requirements-lock.txt:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu   (or the CUDA build)
+#   pip install -r requirements-llm.txt
+torch>=2.6
+transformers>=4.56,<6
