@@ -15,6 +15,9 @@ park. Three methods are provided so they can be compared:
   who appeared in both; normalized to all of Triple-A.
 
 Factors stay blank when either side of the comparison has fewer than ``min_pa`` PAs.
+
+Four candidate statistics are supported (``STATS``). ``woba`` is the default and the statistic
+proposed in docs/park-factor-research.md, pending confirmation.
 """
 from __future__ import annotations
 
@@ -24,7 +27,13 @@ import pandas as pd
 REFERENCE_SCALE = "1.0"
 OUTPUT_COLUMNS = ["season", "home_team", "park_id", "factor", "reference_scale", "n_home_pa", "n_away_pa", "method", "provisional"]
 PITCH_COLUMNS = ["season", "game_pk", "at_bat_number", "batter", "pitcher", "home_team", "away_team", "events", "woba_value", "woba_denom"]
-STATS = {"woba": "wOBA per wOBA-denominator PA", "hr_rate": "home runs per wOBA-denominator PA"}
+STATS = {
+    "woba": "wOBA per wOBA-denominator PA",
+    "hr_rate": "home runs per wOBA-denominator PA",
+    "doubles_triples_rate": "doubles and triples per wOBA-denominator PA",
+    "singles_rate": "singles per wOBA-denominator PA",
+}
+EVENT_STATS = {"hr_rate": {"home_run"}, "doubles_triples_rate": {"double", "triple"}, "singles_rate": {"single"}}
 PLAYED = {"Final", "Completed Early"}
 
 
@@ -58,7 +67,7 @@ def plate_appearances(pitches: pd.DataFrame, games: pd.DataFrame, stat: str = "w
     pa = pitches.loc[pitches.events.notna() & pitches.woba_denom.eq(1)].copy()
     if pa.duplicated(["game_pk", "at_bat_number"]).any():
         raise ValueError("Duplicate PA key")
-    pa["value"] = pa.woba_value.astype(float) if stat == "woba" else pa.events.eq("home_run").astype(float)
+    pa["value"] = pa.woba_value.astype(float) if stat == "woba" else pa.events.isin(EVENT_STATS[stat]).astype(float)
     pa = pa.merge(games[["game_pk", "venue_id", "split_venue"]], on="game_pk", how="left", validate="many_to_one")
     if pa.split_venue.isna().any():
         missing = pa.loc[pa.split_venue.isna(), "game_pk"].nunique()
@@ -137,16 +146,26 @@ def pooled_sums(sums: pd.DataFrame, season: int, window: int = 2) -> pd.DataFram
     return totals.reset_index()
 
 
-def shrink(frame: pd.DataFrame) -> pd.Series:
-    """Empirical-Bayes shrinkage of log factors toward 1.0, one between-park variance per season."""
-    log_factor = np.log(frame.factor)
+def between_park_variance(log_factor: pd.Series, se_log: pd.Series) -> float:
+    """Method-of-moments tau^2: spread of log factors across parks minus mean sampling variance."""
     observed = log_factor.notna()
-    shrunk = pd.Series(np.nan, index=frame.index)
-    for _, index in frame[observed].groupby("season").groups.items():
-        values, se2 = log_factor[index], frame.se_log[index] ** 2
-        true_var = max(0.0, values.var(ddof=1) - se2.mean()) if len(values) > 1 else 0.0
-        shrunk[index] = np.exp(values * true_var / (true_var + se2))
-    return shrunk
+    values, se2 = log_factor[observed], se_log[observed] ** 2
+    return max(0.0, values.var(ddof=1) - se2.mean()) if len(values) > 1 else 0.0
+
+
+def shrink_weights(frame: pd.DataFrame) -> pd.Series:
+    """Empirical-Bayes weights w = tau^2 / (tau^2 + se^2), one between-park variance per season."""
+    log_factor = np.log(frame.factor)
+    weights = pd.Series(np.nan, index=frame.index)
+    for _, index in frame[log_factor.notna()].groupby("season").groups.items():
+        true_var = between_park_variance(log_factor[index], frame.se_log[index])
+        weights[index] = true_var / (true_var + frame.se_log[index] ** 2)
+    return weights
+
+
+def shrink(frame: pd.DataFrame) -> pd.Series:
+    """Empirical-Bayes shrinkage of log factors toward 1.0: factor ** weight."""
+    return frame.factor ** shrink_weights(frame)
 
 
 def player_adjusted(pa: pd.DataFrame, penalty: float = 200.0, iterations: int = 30) -> pd.DataFrame:
@@ -189,7 +208,8 @@ def prototype(pa: pd.DataFrame, teams: pd.DataFrame, stat: str = "woba", min_pa:
     comparisons, outputs = [single], []
     for season in sorted(parks.season.unique()):
         pooled = ratio_factors(pooled_sums(sums, season), parks, min_pa)
-        pooled["factor"] = shrink(pooled)
+        pooled["shrink_weight"] = shrink_weights(pooled)
+        pooled["factor"] = pooled.factor ** pooled.shrink_weight
         pooled["method"] = f"home_away_shrunk_{stat}"
         model = player_adjusted(pa[pa.season.between(season - 1, season)])
         model = parks[parks.season.eq(season)].merge(model, left_on="park_id", right_on="venue_id")
@@ -198,7 +218,7 @@ def prototype(pa: pd.DataFrame, teams: pd.DataFrame, stat: str = "woba", min_pa:
         model["method"] = f"player_adjusted_{stat}"
         comparisons += [pooled, model]
         outputs.append(pooled)
-    columns = ["season", "home_team", "park_id", "method", "factor", "raw_factor", "se_log", "n_home_pa", "n_away_pa", "n_venue_pa", "seasons_used"]
+    columns = ["season", "home_team", "park_id", "method", "factor", "raw_factor", "se_log", "shrink_weight", "n_home_pa", "n_away_pa", "n_venue_pa", "seasons_used"]
     comparison = pd.concat(comparisons, ignore_index=True).reindex(columns=columns)
     output = pd.concat(outputs, ignore_index=True)
     output["reference_scale"] = REFERENCE_SCALE

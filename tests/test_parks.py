@@ -74,6 +74,23 @@ def test_plate_appearances_drop_missing_denominators_and_split_games():
         plate_appearances(pitches, schedule.iloc[1:])
 
 
+def test_statistics_score_the_right_events():
+    pitches, schedule = invented_pitches(relocate=False)
+    events = ["single", "double", "triple", "home_run", "walk", "strikeout"]
+    woba = [0.9, 1.25, 1.6, 2.0, 0.7, 0.0]
+    pitches = pitches.head(len(events)).assign(events=events, woba_value=woba)
+    expected = {
+        "woba": woba,
+        "hr_rate": [0, 0, 0, 1, 0, 0],
+        "doubles_triples_rate": [0, 1, 1, 0, 0, 0],
+        "singles_rate": [1, 0, 0, 0, 0, 0],
+    }
+    for stat, values in expected.items():
+        assert plate_appearances(pitches, schedule, stat).value.tolist() == values
+    with pytest.raises(ValueError, match="Unknown statistic"):
+        plate_appearances(pitches, schedule, "ops")
+
+
 def test_hitter_park_is_above_one_and_relocated_game_counts_at_actual_park():
     pitches, schedule = invented_pitches()
     pa = plate_appearances(pitches, schedule)
@@ -86,6 +103,8 @@ def test_hitter_park_is_above_one_and_relocated_game_counts_at_actual_park():
     assert audit.set_index("home_team").loc["BBB", "n_relocated_games"] == 1
     assert output.set_index("home_team").loc["AAA", "n_home_pa"] == 9 * 40
     assert comparison.method.nunique() == 3
+    shrunk = comparison[comparison.method.str.startswith("home_away_shrunk")]
+    assert shrunk.shrink_weight.between(0, 1).all()
 
 
 def test_single_season_ratio_is_normalized_and_corrects_for_own_park():
