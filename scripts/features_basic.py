@@ -1,8 +1,8 @@
 import pandas as pd
 
 # Load the full 2023 and 2024 Triple-A pitch datasets
-pitches_2023 = pd.read_csv("callup-csv/data/pitches/aaa_2023.csv")
-pitches_2024 = pd.read_csv("callup-csv/data/pitches/aaa_2024.csv")
+pitches_2023 = pd.read_csv("data/shared/pitches/aaa_2023.csv.gz")
+pitches_2024 = pd.read_csv("data/shared/pitches/aaa_2024.csv.gz")
 
 # Combine both seasons into one dataset
 pitches = pd.concat(
@@ -114,7 +114,7 @@ stats["contact_rate"] = stats["contacts"] / stats["swings"].replace(0, float("na
 print(stats.to_string(index=False))
 # Load the study roster
 roster = pd.read_csv(
-    "callup-csv/data/processed/hitter_seasons.csv"
+    "data/shared/processed/hitter_seasons.csv"
 )
 
 # Match calculated statistics to each player and season
