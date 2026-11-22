@@ -51,3 +51,17 @@ The initial five [GitHub issues](https://github.com/AnishAwasthi/callup/issues) 
 Build features for **all players in the study**; manually check 3–5 players to verify your calculations. Work on a separate branch and open a pull request for Anish to review. Commit code and notes; keep generated data files and new source downloads out of Git. The approved frozen inputs in `data/shared/` are already tracked.
 
 When you need them, [study notes](docs/methodology.md) explain the analysis choices and [column definitions](docs/data-contract.md) explain the prepared table.
+
+## Player Profile Dashboard (Issue #7)
+
+The Streamlit dashboard lets users select a player and season to view AAA hitting statistics, available MLB outcomes, and a placeholder for future model predictions.
+
+### Run locally
+
+1. Install dependencies:
+   `python -m pip install -r requirements.txt`
+2. Start the dashboard:
+   `python -m streamlit run app.py`
+3. Open the local URL displayed in the terminal.
+
+The dashboard uses `data/shared/processed/hitter_seasons.csv`. Optional basic hitting statistics are loaded from `data/processed/features_basic.csv` when available.
